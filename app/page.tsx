@@ -8,8 +8,8 @@ type Opportunity = {
   score: number;
   investment: string;
   revenueModel: string;
-  demand: "High" | "Medium" | "Low";
-  competition: "High" | "Medium" | "Low";
+  demand: string;
+  competition: string;
 };
 
 type Analysis = {
@@ -17,10 +17,10 @@ type Analysis = {
   problemSummary: string;
   opportunities: Opportunity[];
   market: {
-    customerDemand: "High" | "Medium" | "Low";
-    marketAccessibility: "High" | "Medium" | "Low";
-    competitivePressure: "High" | "Medium" | "Low";
-    scalability: "High" | "Medium" | "Low";
+    customerDemand: string;
+    marketAccessibility: string;
+    competitivePressure: string;
+    scalability: string;
     targetCustomers: string[];
   };
   risks: string[];
@@ -50,57 +50,46 @@ const examples = [
   },
 ];
 
-async function analyzeProblem(text: string) {
+async function analyzeProblem(problem: string): Promise<Analysis> {
   const response = await fetch("/api/analyze", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      problem: text,
-    }),
+    body: JSON.stringify({ problem }),
   });
 
-  const raw = await response.text();
+  const text = await response.text();
 
-  let data: any = null;
+  let data;
 
   try {
-    data = raw ? JSON.parse(raw) : null;
+    data = JSON.parse(text);
   } catch {
     throw new Error(
-      `The server returned an invalid response (${response.status}).`
+      `Server returned an invalid response (${response.status}).`
     );
   }
 
   if (!response.ok) {
-    throw new Error(
-      data?.error ||
-        `The analysis request failed with status ${response.status}.`
-    );
+    throw new Error(data?.error || "Analysis failed.");
   }
 
-  if (!data) {
-    throw new Error("The server returned an empty response.");
-  }
-
-  return data as Analysis;
+  return data;
 }
 
 export default function Home() {
   const [problem, setProblem] = useState("");
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const [selected, setSelected] = useState(0);
+  const [tab, setTab] = useState("overview");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selected, setSelected] = useState(0);
-  const [activeTab, setActiveTab] = useState("overview");
   const [saved, setSaved] = useState(false);
 
   const runAnalysis = async () => {
-    const finalProblem = problem.trim();
-
-    if (!finalProblem) {
-      setError("Please describe a consumer problem first.");
+    if (!problem.trim()) {
+      setError("Describe a consumer problem first.");
       return;
     }
 
@@ -110,11 +99,11 @@ export default function Home() {
     setSaved(false);
 
     try {
-      const result = await analyzeProblem(finalProblem);
+      const result = await analyzeProblem(problem.trim());
 
       setAnalysis(result);
       setSelected(0);
-      setActiveTab("overview");
+      setTab("overview");
 
       setTimeout(() => {
         document
@@ -125,29 +114,36 @@ export default function Home() {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to analyze the opportunity."
+          : "Unable to analyze this opportunity."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const useExample = (text: string) => {
+  const chooseExample = (text: string) => {
     setProblem(text);
     setError("");
   };
 
+  const currentOpportunity =
+    analysis?.opportunities?.[selected];
+
   return (
-    <main className="site">
-      <header className="nav">
-        <div className="logo">
+    <main className="page">
+      <header className="header">
+        <div className="brand">
           VENTURE<span>LENS</span>
         </div>
 
-        <div className="navRight">AI BUSINESS OPPORTUNITY</div>
+        <div className="headerRight">
+          AI BUSINESS OPPORTUNITY
+        </div>
       </header>
 
       <section className="hero">
+        <div className="heroGlow" />
+
         <div className="eyebrow">
           CONSUMER PROBLEM → BUSINESS OPPORTUNITY
         </div>
@@ -158,29 +154,31 @@ export default function Home() {
           hiding in a problem.
         </h1>
 
-        <p className="heroText">
-          Describe a real consumer problem. VentureLens uses AI to identify
-          startup opportunities, evaluate the market, assess risks and build a
-          practical launch direction.
+        <p>
+          Describe a real consumer problem. VentureLens uses AI to
+          identify startup opportunities, evaluate the market, assess
+          risks and build a practical launch direction.
         </p>
       </section>
 
       <section className="scanner">
-        <div className="scannerTop">
-          <div className="question">WHO IS EXPERIENCING IT?</div>
+        <div className="categoryRow">
+          <div className="categoryLabel">
+            WHO IS EXPERIENCING IT?
+          </div>
 
           <div className="categories">
-            {examples.map((item) => (
+            {examples.map((example) => (
               <button
-                key={item.name}
+                key={example.name}
                 className={
-                  problem === item.text
+                  problem === example.text
                     ? "category active"
                     : "category"
                 }
-                onClick={() => useExample(item.text)}
+                onClick={() => chooseExample(example.text)}
               >
-                {item.name}
+                {example.name}
               </button>
             ))}
           </div>
@@ -188,11 +186,11 @@ export default function Home() {
 
         <textarea
           value={problem}
-          maxLength={500}
           onChange={(e) => {
             setProblem(e.target.value);
             setError("");
           }}
+          maxLength={500}
           placeholder="Describe a real consumer problem..."
         />
 
@@ -200,85 +198,103 @@ export default function Home() {
           <span>{problem.length}/500</span>
 
           <button
-            className="analyzeButton"
+            className="analyze"
             onClick={runAnalysis}
             disabled={loading}
           >
-            {loading ? "Analyzing..." : "Analyze opportunity ✦"}
+            {loading
+              ? "Analyzing..."
+              : "Analyze opportunity ✦"}
           </button>
         </div>
       </section>
 
       {error && (
-        <div className="errorBox">
+        <div className="error">
           {error}
         </div>
       )}
 
       {loading && (
-        <section className="loadingBox">
-          <div className="loader" />
+        <div className="loading">
+          <div className="spinner" />
+
           <div>
-            <strong>Analyzing the opportunity...</strong>
+            <strong>
+              VentureLens is analyzing the problem...
+            </strong>
+
             <p>
-              VentureLens is evaluating demand, competition, risks and
-              potential business models.
+              Evaluating opportunities, customers, market
+              conditions, risks and launch possibilities.
             </p>
           </div>
-        </section>
+        </div>
       )}
 
       {analysis && !loading && (
         <section className="results" id="results">
-          <div className="resultsHeader">
+          <div className="resultsHeading">
             <div>
               <div className="eyebrow">AI ANALYSIS</div>
               <h2>Opportunity report</h2>
             </div>
 
             <button
-              className={saved ? "saveButton saved" : "saveButton"}
+              className={saved ? "save saved" : "save"}
               onClick={() => setSaved(!saved)}
             >
               {saved ? "Saved ✓" : "Save opportunity"}
             </button>
           </div>
 
-          <div className="scoreGrid">
+          <div className="summaryGrid">
             <div className="scoreCard">
-              <div className="scoreNumber">
+              <div className="score">
                 {analysis.problemScore}
               </div>
+
               <div>
-                <div className="cardLabel">PROBLEM SCORE</div>
+                <div className="label">
+                  PROBLEM SCORE
+                </div>
+
                 <p>
-                  Strength of the consumer problem and potential for a
-                  business solution.
+                  Strength of the consumer problem and its
+                  potential for a business solution.
                 </p>
               </div>
             </div>
 
-            <div className="summaryCard">
-              <div className="cardLabel">PROBLEM INSIGHT</div>
+            <div className="insightCard">
+              <div className="label">
+                PROBLEM INSIGHT
+              </div>
+
               <p>{analysis.problemSummary}</p>
             </div>
           </div>
 
-          <div className="opportunitySection">
-            <div className="sectionLabel">TOP BUSINESS OPPORTUNITIES</div>
+          <div className="sectionTitle">
+            TOP BUSINESS OPPORTUNITIES
+          </div>
 
-            <div className="opportunityGrid">
-              {analysis.opportunities.map((opportunity, index) => (
+          <div className="opportunityGrid">
+            {analysis.opportunities.map(
+              (opportunity, index) => (
                 <button
-                  key={opportunity.title}
+                  key={index}
                   className={
                     selected === index
-                      ? "opportunityCard selected"
-                      : "opportunityCard"
+                      ? "opportunity selected"
+                      : "opportunity"
                   }
-                  onClick={() => setSelected(index)}
+                  onClick={() => {
+                    setSelected(index);
+                    setTab("overview");
+                  }}
                 >
-                  <div className="opportunityNumber">
+                  <div className="number">
                     0{index + 1}
                   </div>
 
@@ -286,200 +302,192 @@ export default function Home() {
 
                   <p>{opportunity.description}</p>
 
-                  <div className="opportunityFooter">
+                  <div className="opportunityBottom">
                     <span>
-                      Score <strong>{opportunity.score}</strong>
+                      Score{" "}
+                      <strong>
+                        {opportunity.score}
+                      </strong>
                     </span>
 
                     <span className="arrow">↗</span>
                   </div>
                 </button>
-              ))}
-            </div>
+              )
+            )}
           </div>
 
-          {analysis.opportunities[selected] && (
+          {currentOpportunity && (
             <section className="detail">
-              <div className="detailHeader">
+              <div className="detailHeading">
                 <div>
                   <div className="eyebrow">
                     OPPORTUNITY 0{selected + 1}
                   </div>
+
                   <h2>
-                    {analysis.opportunities[selected].title}
+                    {currentOpportunity.title}
                   </h2>
                 </div>
 
-                <div className="detailScore">
-                  {analysis.opportunities[selected].score}
-                  <span>/100</span>
+                <div className="bigScore">
+                  {currentOpportunity.score}
+                  <small>/100</small>
                 </div>
               </div>
 
               <div className="tabs">
-                {["overview", "market", "risks", "business"].map(
-                  (tab) => (
-                    <button
-                      key={tab}
-                      className={
-                        activeTab === tab ? "tab active" : "tab"
-                      }
-                      onClick={() => setActiveTab(tab)}
-                    >
-                      {tab}
-                    </button>
-                  )
-                )}
+                {[
+                  "overview",
+                  "market",
+                  "risks",
+                  "business",
+                ].map((item) => (
+                  <button
+                    key={item}
+                    className={
+                      tab === item
+                        ? "tab active"
+                        : "tab"
+                    }
+                    onClick={() => setTab(item)}
+                  >
+                    {item}
+                  </button>
+                ))}
               </div>
 
-              {activeTab === "overview" && (
-                <div className="tabContent">
-                  <div className="detailDescription">
-                    {analysis.opportunities[selected].description}
-                  </div>
+              {tab === "overview" && (
+                <div>
+                  <p className="description">
+                    {currentOpportunity.description}
+                  </p>
 
-                  <div className="metrics">
+                  <div className="metricGrid">
                     <Metric
                       label="STARTUP INVESTMENT"
                       value={
-                        analysis.opportunities[selected].investment
+                        currentOpportunity.investment
                       }
                     />
 
                     <Metric
                       label="REVENUE MODEL"
                       value={
-                        analysis.opportunities[selected].revenueModel
+                        currentOpportunity.revenueModel
                       }
                     />
 
                     <Metric
                       label="CUSTOMER DEMAND"
                       value={
-                        analysis.opportunities[selected].demand
+                        currentOpportunity.demand
                       }
                     />
 
                     <Metric
                       label="COMPETITION"
                       value={
-                        analysis.opportunities[selected].competition
+                        currentOpportunity.competition
                       }
                     />
                   </div>
 
-                  <div className="customerBox">
-                    <div className="cardLabel">TARGET CUSTOMERS</div>
-
-                    <div className="tags">
-                      {analysis.market.targetCustomers.map(
-                        (customer) => (
-                          <span className="tag" key={customer}>
-                            {customer}
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
+                  <CustomerList
+                    customers={
+                      analysis.market.targetCustomers
+                    }
+                  />
                 </div>
               )}
 
-              {activeTab === "market" && (
-                <div className="tabContent">
-                  <div className="marketGrid">
+              {tab === "market" && (
+                <div>
+                  <div className="metricGrid">
                     <Metric
                       label="CUSTOMER DEMAND"
-                      value={analysis.market.customerDemand}
+                      value={
+                        analysis.market.customerDemand
+                      }
                     />
 
                     <Metric
                       label="MARKET ACCESSIBILITY"
-                      value={analysis.market.marketAccessibility}
+                      value={
+                        analysis.market.marketAccessibility
+                      }
                     />
 
                     <Metric
                       label="COMPETITIVE PRESSURE"
-                      value={analysis.market.competitivePressure}
+                      value={
+                        analysis.market
+                          .competitivePressure
+                      }
                     />
 
                     <Metric
                       label="SCALABILITY"
-                      value={analysis.market.scalability}
+                      value={
+                        analysis.market.scalability
+                      }
                     />
                   </div>
 
-                  <div className="customerBox">
-                    <div className="cardLabel">TARGET CUSTOMERS</div>
-
-                    <div className="tags">
-                      {analysis.market.targetCustomers.map(
-                        (customer) => (
-                          <span className="tag" key={customer}>
-                            {customer}
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
+                  <CustomerList
+                    customers={
+                      analysis.market.targetCustomers
+                    }
+                  />
                 </div>
               )}
 
-              {activeTab === "risks" && (
-                <div className="tabContent twoColumns">
-                  <div>
-                    <div className="cardLabel">BUSINESS RISKS</div>
+              {tab === "risks" && (
+                <div className="twoColumns">
+                  <ListBlock
+                    title="BUSINESS RISKS"
+                    items={analysis.risks}
+                  />
 
-                    <div className="list">
-                      {analysis.risks.map((risk, index) => (
-                        <div className="listItem" key={index}>
-                          <span>{String(index + 1).padStart(2, "0")}</span>
-                          {risk}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="cardLabel">
-                      ETHICAL CONSIDERATIONS
-                    </div>
-
-                    <div className="list">
-                      {analysis.ethicalConsiderations.map(
-                        (item, index) => (
-                          <div className="listItem" key={index}>
-                            <span>+</span>
-                            {item}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
+                  <ListBlock
+                    title="ETHICAL CONSIDERATIONS"
+                    items={
+                      analysis.ethicalConsiderations
+                    }
+                  />
                 </div>
               )}
 
-              {activeTab === "business" && (
-                <div className="tabContent">
-                  <div className="cardLabel">
+              {tab === "business" && (
+                <div>
+                  <div className="label">
                     PRACTICAL LAUNCH PLAN
                   </div>
 
                   <div className="launchPlan">
-                    {analysis.launchPlan.map((step, index) => (
-                      <div className="launchStep" key={index}>
-                        <div className="day">
-                          {step.day}
-                        </div>
+                    {analysis.launchPlan.map(
+                      (step, index) => (
+                        <div
+                          className="launchStep"
+                          key={index}
+                        >
+                          <div className="launchDay">
+                            {step.day}
+                          </div>
 
-                        <div className="stepNumber">
-                          {String(index + 1).padStart(2, "0")}
-                        </div>
+                          <div className="launchNumber">
+                            {String(index + 1).padStart(
+                              2,
+                              "0"
+                            )}
+                          </div>
 
-                        <div className="stepAction">
-                          {step.action}
+                          <div className="launchAction">
+                            {step.action}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </div>
               )}
@@ -489,8 +497,10 @@ export default function Home() {
       )}
 
       <footer>
-        <div>VENTURELENS</div>
-        <div>TURN PROBLEMS INTO POSSIBILITIES.</div>
+        <span>VENTURELENS</span>
+        <span>
+          TURN PROBLEMS INTO POSSIBILITIES.
+        </span>
       </footer>
 
       <style jsx global>{`
@@ -504,8 +514,8 @@ export default function Home() {
 
         body {
           margin: 0;
-          background: #080909;
-          color: #e9e8e3;
+          background: #090a09;
+          color: #f0efe9;
           font-family:
             Arial,
             Helvetica,
@@ -514,110 +524,122 @@ export default function Home() {
 
         button,
         textarea {
-          font: inherit;
+          font-family: inherit;
         }
 
         button {
           cursor: pointer;
         }
 
-        .site {
+        .page {
           min-height: 100vh;
           background:
             radial-gradient(
-              circle at 76% 27%,
-              rgba(210, 225, 142, 0.2),
-              transparent 25%
+              circle at 74% 23%,
+              rgba(202, 220, 150, 0.25),
+              transparent 24%
             ),
-            #080909;
+            #090a09;
         }
 
-        .nav {
-          height: 86px;
-          border-bottom: 1px solid #4d4b3e;
+        .header {
+          height: 68px;
+          padding: 0 28px;
+          border-bottom: 1px solid #45443c;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 6%;
-          background: rgba(8, 9, 9, 0.88);
         }
 
-        .logo {
-          font-size: 20px;
+        .brand {
+          font-size: 21px;
           font-weight: 900;
+          color: #f0efe9;
           letter-spacing: -1px;
         }
 
-        .logo span {
-          color: #d7ef00;
+        .brand span {
+          color: #d8f000;
         }
 
-        .navRight {
-          color: #a8a79d;
+        .headerRight {
           font-size: 12px;
-          letter-spacing: 2px;
+          color: #c2c0b6;
+          letter-spacing: 3px;
         }
 
         .hero {
-          min-height: 580px;
-          padding: 55px 6% 80px;
+          position: relative;
+          min-height: 545px;
+          overflow: hidden;
+          padding: 48px 25px 70px;
           text-align: center;
-          background:
-            radial-gradient(
-              circle at 72% 38%,
-              rgba(224, 235, 167, 0.3),
-              transparent 24%
-            ),
-            radial-gradient(
-              circle at 70% 40%,
-              rgba(150, 160, 120, 0.14),
-              transparent 38%
-            );
         }
 
-        .eyebrow,
-        .sectionLabel,
-        .question,
-        .cardLabel {
-          color: #b9b6a8;
+        .heroGlow {
+          position: absolute;
+          width: 650px;
+          height: 650px;
+          border-radius: 50%;
+          background: rgba(214, 227, 161, 0.14);
+          filter: blur(80px);
+          top: -220px;
+          right: 14%;
+          pointer-events: none;
+        }
+
+        .eyebrow {
+          position: relative;
+          color: #aaa89d;
           font-size: 12px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
+          letter-spacing: 4px;
+          font-weight: 500;
         }
 
         .hero h1 {
-          margin: 32px auto 30px;
-          max-width: 1000px;
-          font-size: clamp(58px, 7vw, 100px);
-          line-height: 0.93;
-          letter-spacing: -5px;
-          font-weight: 700;
+          position: relative;
+          max-width: 1150px;
+          margin: 55px auto 30px;
+          color: #f1f0eb;
+          font-size: clamp(58px, 7vw, 108px);
+          line-height: 0.9;
+          letter-spacing: -6px;
+          font-weight: 800;
         }
 
-        .heroText {
-          max-width: 720px;
+        .hero p {
+          position: relative;
+          max-width: 760px;
           margin: auto;
-          color: #a8a69d;
+          color: #bbb9ae;
           font-size: 18px;
           line-height: 1.7;
         }
 
         .scanner {
-          width: 94%;
-          max-width: 1500px;
-          margin: -30px auto 100px;
-          border: 1px solid #5b5849;
-          border-radius: 34px;
-          background: #0c0d0d;
+          width: calc(100% - 74px);
+          margin: -10px auto 90px;
+          border: 1px solid #5a584c;
+          border-radius: 32px;
+          background: #0c0d0c;
           overflow: hidden;
         }
 
-        .scannerTop {
-          padding: 32px 38px 20px;
+        .categoryRow {
+          padding: 30px 38px 22px;
           display: flex;
           align-items: center;
-          gap: 24px;
+          gap: 25px;
           flex-wrap: wrap;
+        }
+
+        .categoryLabel,
+        .label,
+        .sectionTitle {
+          color: #aaa89e;
+          font-size: 12px;
+          letter-spacing: 3px;
+          font-weight: 500;
         }
 
         .categories {
@@ -627,105 +649,104 @@ export default function Home() {
         }
 
         .category {
-          border: 1px solid #59564b;
-          border-radius: 30px;
+          border: 1px solid #57554b;
           background: transparent;
-          color: #dddcd6;
-          padding: 12px 22px;
-          transition: 0.2s;
+          color: #e5e3dc;
+          border-radius: 30px;
+          padding: 12px 23px;
+          font-size: 16px;
         }
 
         .category:hover,
         .category.active {
-          background: #d5ef00;
           color: #111;
-          border-color: #d5ef00;
+          background: #d8f000;
+          border-color: #d8f000;
         }
 
         textarea {
-          display: block;
           width: 100%;
-          min-height: 290px;
+          min-height: 300px;
+          display: block;
           resize: vertical;
           border: 0;
-          border-top: 1px solid #393833;
-          border-bottom: 1px solid #393833;
+          border-top: 1px solid #3b3a35;
+          border-bottom: 1px solid #3b3a35;
           outline: none;
-          background: #0c0d0d;
-          color: #e9e8e3;
+          background: #0c0d0c;
+          color: #efeee9;
           padding: 38px 40px;
-          font-size: clamp(25px, 3vw, 43px);
-          line-height: 1.2;
+          font-size: clamp(27px, 3vw, 43px);
+          line-height: 1.22;
         }
 
         textarea::placeholder {
-          color: #56564f;
+          color: #77766d;
         }
 
         .scannerBottom {
-          min-height: 118px;
-          padding: 28px 38px;
+          min-height: 115px;
+          padding: 25px 38px;
           display: flex;
-          justify-content: space-between;
           align-items: center;
+          justify-content: space-between;
           color: #aaa89e;
         }
 
-        .analyzeButton {
+        .analyze {
           border: 0;
-          background: #050505;
-          color: #eee;
-          padding: 20px 32px;
           border-radius: 40px;
+          padding: 19px 30px;
+          background: #050505;
+          color: #f3f1ea;
           font-weight: 700;
-          transition: 0.2s;
+          font-size: 16px;
         }
 
-        .analyzeButton:hover:not(:disabled) {
-          background: #d5ef00;
-          color: #111;
+        .analyze:hover:not(:disabled) {
+          background: #d8f000;
+          color: #101010;
         }
 
-        .analyzeButton:disabled {
-          opacity: 0.6;
+        .analyze:disabled {
+          opacity: 0.55;
           cursor: wait;
         }
 
-        .errorBox {
-          width: 94%;
-          max-width: 1500px;
-          margin: -55px auto 70px;
-          padding: 22px 25px;
-          border: 1px solid #773d3d;
+        .error,
+        .loading {
+          width: calc(100% - 74px);
+          margin: -50px auto 70px;
           border-radius: 18px;
+          padding: 22px 25px;
+        }
+
+        .error {
+          border: 1px solid #743c3c;
           background: #1b0d0d;
-          color: #ff8585;
+          color: #ff8989;
         }
 
-        .loadingBox {
-          width: 94%;
-          max-width: 1500px;
-          margin: -45px auto 90px;
-          padding: 35px;
-          border: 1px solid #555342;
-          border-radius: 22px;
-          display: flex;
-          gap: 25px;
-          align-items: center;
+        .loading {
+          border: 1px solid #555348;
           background: #10110f;
+          color: #eee;
+          display: flex;
+          align-items: center;
+          gap: 20px;
         }
 
-        .loadingBox p {
-          color: #99988f;
+        .loading p {
+          color: #a4a39a;
           margin-bottom: 0;
         }
 
-        .loader {
-          width: 38px;
-          height: 38px;
-          border: 3px solid #45453c;
-          border-top-color: #d5ef00;
+        .spinner {
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
+          border: 3px solid #47473e;
+          border-top-color: #d8f000;
           animation: spin 0.8s linear infinite;
         }
 
@@ -736,144 +757,141 @@ export default function Home() {
         }
 
         .results {
-          width: 94%;
-          max-width: 1500px;
+          width: calc(100% - 74px);
           margin: 0 auto 100px;
         }
 
-        .resultsHeader,
-        .detailHeader {
+        .resultsHeading,
+        .detailHeading {
           display: flex;
-          align-items: center;
           justify-content: space-between;
+          align-items: center;
           gap: 30px;
           margin-bottom: 35px;
         }
 
         .results h2,
         .detail h2 {
-          font-size: clamp(38px, 5vw, 65px);
-          letter-spacing: -3px;
           margin: 10px 0 0;
+          color: #f1f0eb;
+          font-size: clamp(42px, 5vw, 70px);
+          line-height: 0.95;
+          letter-spacing: -4px;
         }
 
-        .saveButton {
-          border: 1px solid #57554a;
-          border-radius: 30px;
+        .save {
+          border: 1px solid #5a584d;
           background: transparent;
-          color: #ddd;
-          padding: 14px 22px;
+          color: #e4e2db;
+          border-radius: 30px;
+          padding: 13px 21px;
         }
 
-        .saveButton.saved {
-          background: #d5ef00;
-          border-color: #d5ef00;
+        .save.saved {
+          background: #d8f000;
           color: #111;
+          border-color: #d8f000;
         }
 
-        .scoreGrid {
+        .summaryGrid {
           display: grid;
           grid-template-columns: 1fr 2fr;
           gap: 18px;
-          margin-bottom: 70px;
+          margin-bottom: 75px;
         }
 
         .scoreCard,
-        .summaryCard,
-        .customerBox,
-        .metric,
+        .insightCard,
         .detail {
-          border: 1px solid #47463e;
-          background: #0d0e0e;
-          border-radius: 24px;
+          border: 1px solid #45443d;
+          border-radius: 25px;
+          background: #0c0d0c;
         }
 
         .scoreCard {
-          padding: 32px;
+          padding: 30px;
           display: flex;
-          gap: 28px;
           align-items: center;
+          gap: 28px;
         }
 
-        .scoreNumber {
-          font-size: 65px;
-          font-weight: 700;
-          color: #d5ef00;
+        .score {
+          color: #d8f000;
+          font-size: 70px;
+          font-weight: 800;
         }
 
         .scoreCard p,
-        .summaryCard p {
-          color: #aaa9a0;
+        .insightCard p {
+          color: #bdbbb1;
           line-height: 1.6;
         }
 
-        .summaryCard {
-          padding: 32px;
+        .insightCard {
+          padding: 30px;
         }
 
-        .summaryCard p {
-          font-size: 20px;
+        .insightCard p {
+          font-size: 19px;
           margin-bottom: 0;
         }
 
-        .opportunitySection {
-          margin-bottom: 70px;
-        }
-
-        .sectionLabel {
-          margin-bottom: 20px;
+        .sectionTitle {
+          margin-bottom: 22px;
         }
 
         .opportunityGrid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 18px;
+          margin-bottom: 80px;
         }
 
-        .opportunityCard {
-          min-height: 290px;
-          padding: 30px;
+        .opportunity {
+          min-height: 310px;
           text-align: left;
-          border: 1px solid #48473e;
-          border-radius: 24px;
-          background: #0d0e0e;
+          padding: 30px;
+          border: 1px solid #46453d;
+          border-radius: 25px;
+          background: #0c0d0c;
           color: #eee;
           transition: 0.2s;
         }
 
-        .opportunityCard:hover,
-        .opportunityCard.selected {
-          border-color: #d5ef00;
+        .opportunity:hover,
+        .opportunity.selected {
+          border-color: #d8f000;
           transform: translateY(-3px);
         }
 
-        .opportunityNumber {
-          color: #d5ef00;
-          font-size: 13px;
+        .number {
+          color: #d8f000;
           letter-spacing: 2px;
         }
 
-        .opportunityCard h3 {
+        .opportunity h3 {
+          color: #f0efe9;
           font-size: 28px;
           line-height: 1.1;
-          margin: 35px 0 15px;
           letter-spacing: -1px;
+          margin: 38px 0 16px;
         }
 
-        .opportunityCard p {
-          color: #9d9c94;
-          line-height: 1.5;
+        .opportunity p {
+          color: #aaa99f;
+          line-height: 1.55;
+          font-size: 15px;
         }
 
-        .opportunityFooter {
-          margin-top: 30px;
+        .opportunityBottom {
+          margin-top: 32px;
           display: flex;
           justify-content: space-between;
-          color: #aaa99f;
+          color: #aaa99e;
         }
 
-        .opportunityFooter strong {
-          color: #d5ef00;
+        .opportunityBottom strong {
+          color: #d8f000;
         }
 
         .arrow {
@@ -884,14 +902,14 @@ export default function Home() {
           padding: 40px;
         }
 
-        .detailScore {
-          font-size: 50px;
-          color: #d5ef00;
-          font-weight: 700;
+        .bigScore {
+          color: #d8f000;
+          font-size: 52px;
+          font-weight: 800;
         }
 
-        .detailScore span {
-          color: #77776f;
+        .bigScore small {
+          color: #77766d;
           font-size: 18px;
           font-weight: 400;
         }
@@ -899,37 +917,33 @@ export default function Home() {
         .tabs {
           display: flex;
           gap: 8px;
-          border-bottom: 1px solid #3d3c36;
+          border-bottom: 1px solid #3d3c37;
           margin-bottom: 35px;
         }
 
         .tab {
-          border: 0;
-          background: transparent;
-          color: #77766e;
           padding: 15px 20px;
+          border: 0;
+          border-bottom: 2px solid transparent;
+          background: transparent;
+          color: #88877e;
           text-transform: capitalize;
         }
 
         .tab.active {
-          color: #d5ef00;
-          border-bottom: 2px solid #d5ef00;
+          color: #d8f000;
+          border-bottom-color: #d8f000;
         }
 
-        .tabContent {
-          min-height: 300px;
-        }
-
-        .detailDescription {
+        .description {
           max-width: 900px;
-          color: #d3d2cc;
-          font-size: 22px;
-          line-height: 1.55;
+          color: #d1d0c9;
+          font-size: 21px;
+          line-height: 1.6;
           margin-bottom: 35px;
         }
 
-        .metrics,
-        .marketGrid {
+        .metricGrid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 14px;
@@ -937,39 +951,45 @@ export default function Home() {
         }
 
         .metric {
+          min-height: 120px;
           padding: 24px;
+          border: 1px solid #45443d;
+          border-radius: 20px;
+          background: #0b0c0b;
         }
 
         .metricValue {
           margin-top: 18px;
-          font-size: 20px;
-          color: #eee;
-          font-weight: 600;
+          color: #f0efe9;
+          font-size: 19px;
+          font-weight: 700;
         }
 
         .customerBox {
           padding: 25px;
-          margin-top: 20px;
+          border: 1px solid #45443d;
+          border-radius: 20px;
+          background: #0b0c0b;
         }
 
         .tags {
           display: flex;
-          gap: 10px;
           flex-wrap: wrap;
+          gap: 10px;
           margin-top: 18px;
         }
 
         .tag {
-          padding: 10px 15px;
-          border: 1px solid #4b4a42;
+          border: 1px solid #4e4d44;
           border-radius: 30px;
-          color: #cccac0;
+          padding: 10px 15px;
+          color: #d5d3ca;
         }
 
         .twoColumns {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 50px;
+          gap: 60px;
         }
 
         .list {
@@ -977,17 +997,10 @@ export default function Home() {
         }
 
         .listItem {
-          padding: 18px 0;
-          border-bottom: 1px solid #33332f;
-          color: #cccac3;
+          padding: 17px 0;
+          border-bottom: 1px solid #34342f;
+          color: #d0cec6;
           line-height: 1.5;
-          display: flex;
-          gap: 18px;
-        }
-
-        .listItem span {
-          color: #d5ef00;
-          min-width: 25px;
         }
 
         .launchPlan {
@@ -996,66 +1009,65 @@ export default function Home() {
 
         .launchStep {
           display: grid;
-          grid-template-columns: 130px 60px 1fr;
+          grid-template-columns: 130px 55px 1fr;
           align-items: center;
           min-height: 75px;
-          border-bottom: 1px solid #33332f;
+          border-bottom: 1px solid #34342f;
         }
 
-        .day {
-          color: #8f8e86;
-          text-transform: uppercase;
-          font-size: 12px;
+        .launchDay {
+          color: #929189;
+          font-size: 11px;
           letter-spacing: 2px;
+          text-transform: uppercase;
         }
 
-        .stepNumber {
-          color: #d5ef00;
+        .launchNumber {
+          color: #d8f000;
         }
 
-        .stepAction {
-          color: #d4d3cd;
+        .launchAction {
+          color: #d4d2ca;
         }
 
         footer {
-          border-top: 1px solid #37372f;
-          padding: 35px 6%;
+          padding: 35px 28px;
+          border-top: 1px solid #393832;
           display: flex;
           justify-content: space-between;
-          color: #77776e;
+          color: #8b8980;
           font-size: 11px;
-          letter-spacing: 2px;
+          letter-spacing: 3px;
         }
 
         @media (max-width: 900px) {
-          .hero h1 {
-            letter-spacing: -3px;
-          }
-
-          .scoreGrid,
+          .summaryGrid,
           .opportunityGrid,
           .twoColumns {
             grid-template-columns: 1fr;
           }
 
-          .metrics,
-          .marketGrid {
+          .metricGrid {
             grid-template-columns: 1fr 1fr;
+          }
+
+          .hero h1 {
+            letter-spacing: -4px;
           }
         }
 
         @media (max-width: 600px) {
-          .nav {
-            padding: 0 20px;
-          }
-
-          .navRight {
+          .headerRight {
             display: none;
           }
 
+          .header {
+            padding: 0 18px;
+          }
+
           .hero {
-            padding-left: 20px;
-            padding-right: 20px;
+            padding-left: 18px;
+            padding-right: 18px;
           }
 
           .hero h1 {
@@ -1064,38 +1076,38 @@ export default function Home() {
 
           .scanner,
           .results,
-          .errorBox,
-          .loadingBox {
+          .error,
+          .loading {
             width: calc(100% - 24px);
           }
 
-          .scannerTop,
+          .categoryRow,
           .scannerBottom,
           .detail {
             padding: 22px;
           }
 
           textarea {
+            min-height: 240px;
             padding: 25px 22px;
-            min-height: 230px;
           }
 
           .scannerBottom {
             align-items: flex-start;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
           }
 
-          .analyzeButton {
+          .analyze {
             width: 100%;
           }
 
-          .metrics,
-          .marketGrid {
+          .metricGrid {
             grid-template-columns: 1fr;
           }
 
-          .detailHeader {
+          .resultsHeading,
+          .detailHeading {
             align-items: flex-start;
             flex-direction: column;
           }
@@ -1123,11 +1135,50 @@ function Metric({
 }) {
   return (
     <div className="metric">
-      <div className="cardLabel">{label}</div>
+      <div className="label">{label}</div>
       <div className="metricValue">{value}</div>
     </div>
   );
 }
 
+function CustomerList({
+  customers,
+}: {
+  customers: string[];
+}) {
+  return (
+    <div className="customerBox">
+      <div className="label">TARGET CUSTOMERS</div>
 
+      <div className="tags">
+        {customers.map((customer, index) => (
+          <span className="tag" key={index}>
+            {customer}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
+function ListBlock({
+  title,
+  items,
+}: {
+  title: string;
+  items: string[];
+}) {
+  return (
+    <div>
+      <div className="label">{title}</div>
+
+      <div className="list">
+        {items.map((item, index) => (
+          <div className="listItem" key={index}>
+            {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
