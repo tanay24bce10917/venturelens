@@ -1,19 +1,146 @@
 import OpenAI from "openai";
 
+const analysisSchema = {
+  type: "object",
+  properties: {
+    problemScore: {
+      type: "number",
+    },
+    problemSummary: {
+      type: "string",
+    },
+    opportunities: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          description: { type: "string" },
+          score: { type: "number" },
+          investment: { type: "string" },
+          revenueModel: { type: "string" },
+          demand: {
+            type: "string",
+            enum: ["High", "Medium", "Low"],
+          },
+          competition: {
+            type: "string",
+            enum: ["High", "Medium", "Low"],
+          },
+        },
+        required: [
+          "title",
+          "description",
+          "score",
+          "investment",
+          "revenueModel",
+          "demand",
+          "competition",
+        ],
+        additionalProperties: false,
+      },
+    },
+    market: {
+      type: "object",
+      properties: {
+        customerDemand: {
+          type: "string",
+          enum: ["High", "Medium", "Low"],
+        },
+        marketAccessibility: {
+          type: "string",
+          enum: ["High", "Medium", "Low"],
+        },
+        competitivePressure: {
+          type: "string",
+          enum: ["High", "Medium", "Low"],
+        },
+        scalability: {
+          type: "string",
+          enum: ["High", "Medium", "Low"],
+        },
+        targetCustomers: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
+      },
+      required: [
+        "customerDemand",
+        "marketAccessibility",
+        "competitivePressure",
+        "scalability",
+        "targetCustomers",
+      ],
+      additionalProperties: false,
+    },
+    risks: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+    ethicalConsiderations: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+    launchPlan: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          day: { type: "string" },
+          action: { type: "string" },
+        },
+        required: ["day", "action"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: [
+    "problemScore",
+    "problemSummary",
+    "opportunities",
+    "market",
+    "risks",
+    "ethicalConsiderations",
+    "launchPlan",
+  ],
+  additionalProperties: false,
+};
 
 export async function POST(request: Request) {
-    const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
   try {
-    const { problem } = await request.json();
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+      return Response.json(
+        {
+          error:
+            "OPENAI_API_KEY is not configured on the server. Add it in Vercel Environment Variables.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const body = await request.json();
+    const problem = body?.problem;
 
     if (!problem || typeof problem !== "string") {
       return Response.json(
-        { error: "Please describe a consumer problem." },
+        {
+          error: "Please describe a consumer problem.",
+        },
         { status: 400 }
       );
     }
+
+    const client = new OpenAI({
+      apiKey,
+    });
 
     const response = await client.responses.create({
       model: "gpt-5.5",
@@ -21,11 +148,11 @@ export async function POST(request: Request) {
       instructions: `
 You are VentureLens, an AI-powered business opportunity analyst.
 
-Your job is to take a consumer problem and turn it into realistic startup opportunities.
+Your job is to transform a real consumer problem into realistic startup opportunities.
 
 Analyze:
-- consumer pain
-- business opportunities
+- the consumer pain
+- potential business opportunities
 - target customers
 - market demand
 - market accessibility
@@ -37,74 +164,68 @@ Analyze:
 - ethical considerations
 - practical launch plan
 
-Do not invent precise statistics.
-Do not pretend estimates are verified market research.
+Focus on realistic opportunities that could actually be started by a student or early-stage entrepreneur in India.
 
-Return ONLY valid JSON.
+Do not invent precise market statistics.
+Do not claim that estimates are verified market research.
+
+Return structured data matching the supplied schema.
 `,
 
       input: `
-Analyze this consumer problem:
+Consumer problem:
 
 ${problem}
 
-Return exactly this JSON structure:
+Generate exactly 3 realistic business opportunities.
 
-{
-  "problemScore": 0,
-  "problemSummary": "",
-  "opportunities": [
-    {
-      "title": "",
-      "description": "",
-      "score": 0,
-      "investment": "",
-      "revenueModel": "",
-      "demand": "High",
-      "competition": "Medium"
-    }
-  ],
-  "market": {
-    "customerDemand": "High",
-    "marketAccessibility": "High",
-    "competitivePressure": "Medium",
-    "scalability": "High",
-    "targetCustomers": []
-  },
-  "risks": [],
-  "ethicalConsiderations": [],
-  "launchPlan": [
-    {
-      "day": "",
-      "action": ""
-    }
-  ]
-}
+Investment ranges should be realistic Indian startup estimates such as:
+₹10K–₹50K
+₹50K–₹2L
+₹2L–₹5L
 
-Requirements:
+Give practical revenue models.
 
-- Give exactly 3 opportunities.
-- Scores must be between 0 and 100.
-- Use realistic Indian startup investment ranges such as ₹10K–₹50K.
-- Give realistic revenue models.
-- Make target customers specific.
-- Give practical business risks.
-- Include relevant ethical considerations.
-- Give 5-7 practical launch-plan steps.
-- Do not invent exact market-size statistics.
-`
+Identify specific customer groups.
+
+Identify realistic business risks.
+
+Include ethical considerations where relevant.
+
+Create a practical 5–7 step launch plan.
+`,
+
+      text: {
+        format: {
+          type: "json_schema",
+          name: "venturelens_analysis",
+          strict: true,
+          schema: analysisSchema,
+        },
+      },
     });
+
+    if (!response.output_text) {
+      return Response.json(
+        {
+          error: "The AI returned an empty response. Please try again.",
+        },
+        { status: 502 }
+      );
+    }
 
     const result = JSON.parse(response.output_text);
 
     return Response.json(result);
-
   } catch (error) {
     console.error("VentureLens API error:", error);
 
+    const message =
+      error instanceof Error ? error.message : "Unknown server error";
+
     return Response.json(
       {
-        error: "Unable to analyze the opportunity. Please try again."
+        error: `AI analysis failed: ${message}`,
       },
       { status: 500 }
     );
