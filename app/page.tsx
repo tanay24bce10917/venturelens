@@ -87,9 +87,16 @@ export default function Home() {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
 
+  const scrollToScanner = () => {
+    document
+      .getElementById("scanner")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const runAnalysis = async () => {
     if (!problem.trim()) {
       setError("Describe a consumer problem first.");
+      scrollToScanner();
       return;
     }
 
@@ -108,8 +115,8 @@ export default function Home() {
       setTimeout(() => {
         document
           .getElementById("results")
-          ?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     } catch (err) {
       setError(
         err instanceof Error
@@ -124,124 +131,241 @@ export default function Home() {
   const chooseExample = (text: string) => {
     setProblem(text);
     setError("");
+
+    setTimeout(() => {
+      document
+        .querySelector(".problemInput")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   };
 
-  const currentOpportunity =
-    analysis?.opportunities?.[selected];
+  const currentOpportunity = analysis?.opportunities?.[selected];
 
   return (
-    <main className="page">
-      <header className="header">
-        <div className="brand">
+    <main className="venturePage">
+      <header className="topbar">
+        <div className="logo">
           VENTURE<span>LENS</span>
         </div>
 
-        <div className="headerRight">
-          AI BUSINESS OPPORTUNITY
+        <div className="topbarRight">
+          <span className="statusDot" />
+          AI BUSINESS OPPORTUNITY FINDER
         </div>
       </header>
 
       <section className="hero">
-        <div className="heroGlow" />
+        <div className="heroOrb heroOrbOne" />
+        <div className="heroOrb heroOrbTwo" />
 
-        <div className="eyebrow">
-          CONSUMER PROBLEM → BUSINESS OPPORTUNITY
+        <div className="heroGrid" />
+
+        <div className="heroContent">
+          <div className="heroEyebrow">
+            <span className="eyebrowLine" />
+            CONSUMER PROBLEM → BUSINESS OPPORTUNITY
+            <span className="eyebrowLine" />
+          </div>
+
+          <h1>
+            Find the business
+            <br />
+            <em>hiding in a problem.</em>
+          </h1>
+
+          <p className="heroDescription">
+            VentureLens turns everyday consumer frustrations into
+            potential startup opportunities — evaluating demand,
+            customers, competition, risks and practical ways to launch.
+          </p>
+
+          <button className="heroCTA" onClick={scrollToScanner}>
+            <span>Try VentureLens</span>
+            <strong>↓</strong>
+          </button>
+
+          <div className="heroMeta">
+            <div>
+              <span>01</span>
+              IDENTIFY
+            </div>
+
+            <div className="metaLine" />
+
+            <div>
+              <span>02</span>
+              ANALYZE
+            </div>
+
+            <div className="metaLine" />
+
+            <div>
+              <span>03</span>
+              BUILD
+            </div>
+          </div>
         </div>
 
-        <h1>
-          Find the business
-          <br />
-          hiding in a problem.
-        </h1>
-
-        <p>
-          Describe a real consumer problem. VentureLens uses AI to
-          identify startup opportunities, evaluate the market, assess
-          risks and build a practical launch direction.
-        </p>
+        <div className="scrollHint">
+          <span>SCROLL TO EXPLORE</span>
+          <div className="scrollArrow">↓</div>
+        </div>
       </section>
 
-      <section className="scanner">
-        <div className="categoryRow">
-          <div className="categoryLabel">
-            WHO IS EXPERIENCING IT?
+      <section className="introStrip">
+        <div className="introNumber">01</div>
+
+        <div className="introText">
+          <span>THE IDEA</span>
+          <p>
+            Great businesses often begin with a simple observation:
+            something people struggle with every day.
+          </p>
+        </div>
+
+        <div className="introText right">
+          <span>THE MISSION</span>
+          <p>
+            Use AI to transform those observations into structured,
+            testable business opportunities.
+          </p>
+        </div>
+      </section>
+
+      <section className="scannerSection" id="scanner">
+        <div className="sectionHeader">
+          <div>
+            <div className="sectionEyebrow">
+              OPPORTUNITY SCANNER
+            </div>
+
+            <h2>
+              What problem
+              <br />
+              are you solving?
+            </h2>
           </div>
 
-          <div className="categories">
-            {examples.map((example) => (
-              <button
-                key={example.name}
-                className={
-                  problem === example.text
-                    ? "category active"
-                    : "category"
-                }
-                onClick={() => chooseExample(example.text)}
-              >
-                {example.name}
-              </button>
-            ))}
+          <div className="sectionSideText">
+            Tell VentureLens about a real consumer problem.
+            <br />
+            We&apos;ll explore what could be built around it.
           </div>
         </div>
 
-        <textarea
-          value={problem}
-          onChange={(e) => {
-            setProblem(e.target.value);
-            setError("");
-          }}
-          maxLength={500}
-          placeholder="Describe a real consumer problem..."
-        />
+        <div className="scanner">
+          <div className="scannerTop">
+            <div className="scannerLabel">
+              WHO IS EXPERIENCING IT?
+            </div>
 
-        <div className="scannerBottom">
-          <span>{problem.length}/500</span>
+            <div className="categories">
+              {examples.map((example) => (
+                <button
+                  key={example.name}
+                  className={
+                    problem === example.text
+                      ? "category active"
+                      : "category"
+                  }
+                  onClick={() => chooseExample(example.text)}
+                >
+                  {example.name}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <button
-            className="analyze"
-            onClick={runAnalysis}
-            disabled={loading}
-          >
-            {loading
-              ? "Analyzing..."
-              : "Analyze opportunity ✦"}
-          </button>
+          <div className="problemInput">
+            <textarea
+              value={problem}
+              onChange={(e) => {
+                setProblem(e.target.value);
+                setError("");
+              }}
+              maxLength={500}
+              placeholder="Describe a real consumer problem..."
+            />
+          </div>
+
+          <div className="scannerBottom">
+            <div className="characterCount">
+              {problem.length.toString().padStart(3, "0")} / 500
+            </div>
+
+            <button
+              className="analyzeButton"
+              onClick={runAnalysis}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="buttonSpinner" />
+                  Analyzing
+                </>
+              ) : (
+                <>
+                  Analyze opportunity
+                  <span>✦</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="scannerNote">
+          <span>VENTURELENS AI</span>
+          <span>
+            START WITH A PROBLEM. END WITH A POSSIBILITY.
+          </span>
         </div>
       </section>
 
       {error && (
-        <div className="error">
-          {error}
+        <div className="errorBox">
+          <strong>Something went wrong.</strong>
+          <span>{error}</span>
         </div>
       )}
 
       {loading && (
-        <div className="loading">
-          <div className="spinner" />
+        <section className="loadingSection">
+          <div className="loadingOrb">
+            <div />
+          </div>
 
           <div>
-            <strong>
-              VentureLens is analyzing the problem...
-            </strong>
+            <div className="loadingEyebrow">
+              VENTURELENS IS THINKING
+            </div>
+
+            <h3>Turning the problem into possibilities...</h3>
 
             <p>
-              Evaluating opportunities, customers, market
-              conditions, risks and launch possibilities.
+              Evaluating business models, customer demand,
+              competition, risks and launch potential.
             </p>
           </div>
-        </div>
+        </section>
       )}
 
       {analysis && !loading && (
-        <section className="results" id="results">
-          <div className="resultsHeading">
+        <section className="resultsSection" id="results">
+          <div className="resultsTop">
             <div>
-              <div className="eyebrow">AI ANALYSIS</div>
-              <h2>Opportunity report</h2>
+              <div className="sectionEyebrow">
+                AI-GENERATED ANALYSIS
+              </div>
+
+              <h2>
+                Opportunity
+                <br />
+                <em>report.</em>
+              </h2>
             </div>
 
             <button
-              className={saved ? "save saved" : "save"}
+              className={saved ? "saveButton saved" : "saveButton"}
               onClick={() => setSaved(!saved)}
             >
               {saved ? "Saved ✓" : "Save opportunity"}
@@ -250,87 +374,98 @@ export default function Home() {
 
           <div className="summaryGrid">
             <div className="scoreCard">
-              <div className="score">
+              <div className="scoreLabel">PROBLEM SCORE</div>
+
+              <div className="scoreNumber">
                 {analysis.problemScore}
+                <small>/100</small>
               </div>
 
-              <div>
-                <div className="label">
-                  PROBLEM SCORE
-                </div>
-
-                <p>
-                  Strength of the consumer problem and its
-                  potential for a business solution.
-                </p>
+              <div className="scoreBar">
+                <div
+                  style={{
+                    width: `${Math.min(
+                      Math.max(analysis.problemScore, 0),
+                      100
+                    )}%`,
+                  }}
+                />
               </div>
+
+              <p>
+                Strength of the consumer pain point and its
+                potential for a business solution.
+              </p>
             </div>
 
             <div className="insightCard">
-              <div className="label">
-                PROBLEM INSIGHT
-              </div>
+              <div className="cardEyebrow">PROBLEM INSIGHT</div>
 
               <p>{analysis.problemSummary}</p>
             </div>
           </div>
 
-          <div className="sectionTitle">
-            TOP BUSINESS OPPORTUNITIES
+          <div className="opportunitiesHeader">
+            <div>
+              <span>02</span>
+              TOP BUSINESS OPPORTUNITIES
+            </div>
+
+            <p>
+              Three directions worth investigating based on
+              the problem.
+            </p>
           </div>
 
           <div className="opportunityGrid">
-            {analysis.opportunities.map(
-              (opportunity, index) => (
-                <button
-                  key={index}
-                  className={
-                    selected === index
-                      ? "opportunity selected"
-                      : "opportunity"
-                  }
-                  onClick={() => {
-                    setSelected(index);
-                    setTab("overview");
-                  }}
-                >
-                  <div className="number">
-                    0{index + 1}
-                  </div>
+            {analysis.opportunities.map((opportunity, index) => (
+              <button
+                key={index}
+                className={
+                  selected === index
+                    ? "opportunityCard selected"
+                    : "opportunityCard"
+                }
+                onClick={() => {
+                  setSelected(index);
+                  setTab("overview");
+                }}
+              >
+                <div className="opportunityNumber">
+                  0{index + 1}
+                </div>
 
-                  <h3>{opportunity.title}</h3>
+                <div className="opportunityScore">
+                  {opportunity.score}
+                </div>
 
-                  <p>{opportunity.description}</p>
+                <h3>{opportunity.title}</h3>
 
-                  <div className="opportunityBottom">
-                    <span>
-                      Score{" "}
-                      <strong>
-                        {opportunity.score}
-                      </strong>
-                    </span>
+                <p>{opportunity.description}</p>
 
-                    <span className="arrow">↗</span>
-                  </div>
-                </button>
-              )
-            )}
+                <div className="opportunityFooter">
+                  <span>
+                    {opportunity.demand} demand
+                  </span>
+
+                  <span className="cardArrow">↗</span>
+                </div>
+              </button>
+            ))}
           </div>
 
           {currentOpportunity && (
-            <section className="detail">
-              <div className="detailHeading">
+            <section className="detailSection">
+              <div className="detailTop">
                 <div>
-                  <div className="eyebrow">
+                  <div className="sectionEyebrow">
                     OPPORTUNITY 0{selected + 1}
                   </div>
 
-                  <h2>
-                    {currentOpportunity.title}
-                  </h2>
+                  <h2>{currentOpportunity.title}</h2>
                 </div>
 
-                <div className="bigScore">
+                <div className="detailScore">
                   {currentOpportunity.score}
                   <small>/100</small>
                 </div>
@@ -346,9 +481,7 @@ export default function Home() {
                   <button
                     key={item}
                     className={
-                      tab === item
-                        ? "tab active"
-                        : "tab"
+                      tab === item ? "tab active" : "tab"
                     }
                     onClick={() => setTab(item)}
                   >
@@ -358,34 +491,270 @@ export default function Home() {
               </div>
 
               {tab === "overview" && (
-                <div>
-                  <p className="description">
+                <div className="detailContent">
+                  <p className="detailDescription">
                     {currentOpportunity.description}
                   </p>
 
                   <div className="metricGrid">
                     <Metric
                       label="STARTUP INVESTMENT"
-                      value={
-                        currentOpportunity.investment
-                      }
+                      value={currentOpportunity.investment}
                     />
 
                     <Metric
                       label="REVENUE MODEL"
-                      value={
-                        currentOpportunity.revenueModel
-                      }
+                      value={currentOpportunity.revenueModel}
                     />
 
                     <Metric
                       label="CUSTOMER DEMAND"
-                      value={
-                        currentOpportunity.demand
-                      }
+                      value={currentOpportunity.demand}
                     />
 
                     <Metric
+                      label="COMPETITION"
+                      value={currentOpportunity.competition}
+                    />
+                  </div>
+
+                  <CustomerList
+                    customers={analysis.market.targetCustomers}
+                  />
+                </div>
+              )}
+
+              {tab === "market" && (
+                <div className="detailContent">
+                  <div className="metricGrid">
+                    <Metric
+                      label="CUSTOMER DEMAND"
+                      value={analysis.market.customerDemand}
+                    />
+
+                    <Metric
+                      label="MARKET ACCESSIBILITY"
+                      value={analysis.market.marketAccessibility}
+                    />
+
+                    <Metric
+                      label="COMPETITIVE PRESSURE"
+                      value={analysis.market.competitivePressure}
+                    />
+
+                    <Metric
+                      label="SCALABILITY"
+                      value={analysis.market.scalability}
+                    />
+                  </div>
+
+                  <CustomerList
+                    customers={analysis.market.targetCustomers}
+                  />
+                </div>
+              )}
+
+              {tab === "risks" && (
+                <div className="twoColumns">
+                  <ListBlock
+                    title="BUSINESS RISKS"
+                    items={analysis.risks}
+                  />
+
+                  <ListBlock
+                    title="ETHICAL CONSIDERATIONS"
+                    items={analysis.ethicalConsiderations}
+                  />
+                </div>
+              )}
+
+              {tab === "business" && (
+                <div className="launchSection">
+                  <div className="cardEyebrow">
+                    PRACTICAL LAUNCH PLAN
+                  </div>
+
+                  <div className="launchPlan">
+                    {analysis.launchPlan.map((step, index) => (
+                      <div className="launchStep" key={index}>
+                        <div className="launchDay">
+                          {step.day}
+                        </div>
+
+                        <div className="launchNumber">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+
+                        <div className="launchAction">
+                          {step.action}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+        </section>
+      )}
+
+      <footer className="footer">
+        <div className="footerBrand">
+          VENTURE<span>LENS</span>
+        </div>
+
+        <div>AI BUSINESS OPPORTUNITY FINDER</div>
+
+        <div>TURN PROBLEMS INTO POSSIBILITIES.</div>
+      </footer>
+
+      <style jsx global>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        html {
+          scroll-behavior: smooth;
+          background: #090a09 !important;
+        }
+
+        body {
+          margin: 0 !important;
+          background: #090a09 !important;
+          color: #eeeDE7 !important;
+          font-family:
+            Arial,
+            Helvetica,
+            sans-serif !important;
+        }
+
+        button,
+        textarea {
+          font-family: inherit !important;
+        }
+
+        button {
+          cursor: pointer;
+        }
+
+        .venturePage {
+          min-height: 100vh;
+          overflow: hidden;
+          background: #090a09 !important;
+          color: #eeeDE7 !important;
+        }
+
+        .topbar {
+          height: 72px;
+          padding: 0 42px;
+          border-bottom: 1px solid #34352f;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #090a09;
+          position: relative;
+          z-index: 10;
+        }
+
+        .logo {
+          color: #f0efe8 !important;
+          font-size: 18px;
+          font-weight: 800;
+          letter-spacing: -0.7px;
+        }
+
+        .logo span,
+        .footerBrand span {
+          color: #d9f000 !important;
+        }
+
+        .topbarRight {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          color: #898980 !important;
+          font-size: 10px;
+          letter-spacing: 2.5px;
+        }
+
+        .statusDot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #d9f000;
+          box-shadow: 0 0 12px rgba(217, 240, 0, 0.6);
+        }
+
+        .hero {
+          min-height: 720px;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          background:
+            radial-gradient(
+              circle at 68% 30%,
+              rgba(191, 216, 126, 0.22),
+              transparent 27%
+            ),
+            radial-gradient(
+              circle at 50% 70%,
+              rgba(110, 120, 82, 0.08),
+              transparent 35%
+            ),
+            #090a09;
+        }
+
+        .heroGrid {
+          position: absolute;
+          inset: 0;
+          opacity: 0.28;
+          background-image:
+            linear-gradient(
+              rgba(255, 255, 255, 0.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.035) 1px,
+              transparent 1px
+            );
+          background-size: 90px 90px;
+          mask-image: linear-gradient(
+            to bottom,
+            black,
+            transparent 80%
+          );
+        }
+
+        .heroOrb {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          filter: blur(70px);
+        }
+
+        .heroOrbOne {
+          width: 330px;
+          height: 330px;
+          top: 20px;
+          right: 7%;
+          background: rgba(207, 227, 147, 0.12);
+        }
+
+        .heroOrbTwo {
+          width: 250px;
+          height: 250px;
+          bottom: 20px;
+          left: 5%;
+          background: rgba(176, 195, 115, 0.06);
+        }
+
+        .heroContent {
+          position: relative;
+          z-index: 2;
+  tric
                       label="COMPETITION"
                       value={
                         currentOpportunity.competition
