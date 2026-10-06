@@ -87,16 +87,18 @@ export default function Home() {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
 
-  const scrollToScanner = () => {
+  const goToScanner = () => {
     document
-      .getElementById("scanner")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      .getElementById("problem-scanner")
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
   };
 
   const runAnalysis = async () => {
     if (!problem.trim()) {
       setError("Describe a consumer problem first.");
-      scrollToScanner();
       return;
     }
 
@@ -115,7 +117,10 @@ export default function Home() {
       setTimeout(() => {
         document
           .getElementById("results")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
       }, 150);
     } catch (err) {
       setError(
@@ -131,111 +136,124 @@ export default function Home() {
   const chooseExample = (text: string) => {
     setProblem(text);
     setError("");
-
-    setTimeout(() => {
-      document
-        .querySelector(".problemInput")
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 100);
   };
 
-  const currentOpportunity = analysis?.opportunities?.[selected];
+  const currentOpportunity =
+    analysis?.opportunities?.[selected];
 
   return (
-    <main className="venturePage">
-      <header className="topbar">
-        <div className="logo">
+    <main className="vl-page">
+      {/* HEADER */}
+      <header className="vl-header">
+        <div className="vl-logo">
           VENTURE<span>LENS</span>
         </div>
 
-        <div className="topbarRight">
-          <span className="statusDot" />
+        <div className="vl-header-label">
           AI BUSINESS OPPORTUNITY FINDER
         </div>
       </header>
 
-      <section className="hero">
-        <div className="heroOrb heroOrbOne" />
-        <div className="heroOrb heroOrbTwo" />
+      {/* HERO */}
+      <section className="vl-hero">
+        <div className="vl-hero-glow" />
 
-        <div className="heroGrid" />
+        <div className="vl-grid" />
 
-        <div className="heroContent">
-          <div className="heroEyebrow">
-            <span className="eyebrowLine" />
-            CONSUMER PROBLEM → BUSINESS OPPORTUNITY
-            <span className="eyebrowLine" />
+        <div className="vl-hero-content">
+          <div className="vl-eyebrow">
+            CONSUMER PROBLEM&nbsp;&nbsp;→&nbsp;&nbsp; BUSINESS OPPORTUNITY
           </div>
 
           <h1>
             Find the business
             <br />
-            <em>hiding in a problem.</em>
+            <span>hiding in a problem.</span>
           </h1>
 
-          <p className="heroDescription">
-            VentureLens turns everyday consumer frustrations into
-            potential startup opportunities — evaluating demand,
-            customers, competition, risks and practical ways to launch.
+          <p className="vl-hero-description">
+            Describe a real consumer problem. VentureLens uses AI
+            to discover potential startup opportunities, evaluate
+            the market, identify risks and help you decide what
+            could be built.
           </p>
 
-          <button className="heroCTA" onClick={scrollToScanner}>
+          {/* THIS IS THE BUTTON THAT MUST BE VISIBLE */}
+          <button
+            type="button"
+            className="vl-try-button"
+            onClick={goToScanner}
+          >
             <span>Try VentureLens</span>
-            <strong>↓</strong>
+            <b>↓</b>
           </button>
 
-          <div className="heroMeta">
+          <div className="vl-hero-stats">
             <div>
-              <span>01</span>
-              IDENTIFY
+              <strong>01</strong>
+              <span>PROBLEM</span>
             </div>
 
-            <div className="metaLine" />
+            <i />
 
             <div>
-              <span>02</span>
-              ANALYZE
+              <strong>02</strong>
+              <span>OPPORTUNITY</span>
             </div>
 
-            <div className="metaLine" />
+            <i />
 
             <div>
-              <span>03</span>
-              BUILD
+              <strong>03</strong>
+              <span>STARTUP</span>
             </div>
           </div>
         </div>
 
-        <div className="scrollHint">
+        <div className="vl-scroll">
           <span>SCROLL TO EXPLORE</span>
-          <div className="scrollArrow">↓</div>
+          <b>↓</b>
         </div>
       </section>
 
-      <section className="introStrip">
-        <div className="introNumber">01</div>
+      {/* INTRO / STATEMENT SECTION */}
+      <section className="vl-statement">
+        <div className="vl-statement-number">01</div>
 
-        <div className="introText">
-          <span>THE IDEA</span>
-          <p>
-            Great businesses often begin with a simple observation:
-            something people struggle with every day.
-          </p>
+        <div className="vl-statement-main">
+          <div className="vl-small-label">THE IDEA</div>
+
+          <h2>
+            Every frustrating
+            <br />
+            experience can hide
+            <br />
+            an opportunity.
+          </h2>
         </div>
 
-        <div className="introText right">
-          <span>THE MISSION</span>
+        <div className="vl-statement-side">
           <p>
-            Use AI to transform those observations into structured,
-            testable business opportunities.
+            VentureLens starts where entrepreneurs usually
+            start: with a problem.
+          </p>
+
+          <p>
+            Instead of guessing what business to build,
+            describe something people genuinely struggle with
+            and let AI help explore the possibilities.
           </p>
         </div>
       </section>
 
-      <section className="scannerSection" id="scanner">
-        <div className="sectionHeader">
+      {/* PROBLEM SCANNER */}
+      <section
+        className="vl-scanner-section"
+        id="problem-scanner"
+      >
+        <div className="vl-scanner-heading">
           <div>
-            <div className="sectionEyebrow">
+            <div className="vl-small-label">
               OPPORTUNITY SCANNER
             </div>
 
@@ -246,27 +264,26 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="sectionSideText">
+          <p>
             Tell VentureLens about a real consumer problem.
             <br />
-            We&apos;ll explore what could be built around it.
-          </div>
+            We&apos;ll turn it into potential business directions.
+          </p>
         </div>
 
-        <div className="scanner">
-          <div className="scannerTop">
-            <div className="scannerLabel">
-              WHO IS EXPERIENCING IT?
-            </div>
+        <div className="vl-scanner">
+          <div className="vl-scanner-top">
+            <span>WHO IS EXPERIENCING IT?</span>
 
-            <div className="categories">
+            <div className="vl-categories">
               {examples.map((example) => (
                 <button
+                  type="button"
                   key={example.name}
                   className={
                     problem === example.text
-                      ? "category active"
-                      : "category"
+                      ? "vl-category active"
+                      : "vl-category"
                   }
                   onClick={() => chooseExample(example.text)}
                 >
@@ -276,113 +293,120 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="problemInput">
-            <textarea
-              value={problem}
-              onChange={(e) => {
-                setProblem(e.target.value);
-                setError("");
-              }}
-              maxLength={500}
-              placeholder="Describe a real consumer problem..."
-            />
-          </div>
+          <textarea
+            value={problem}
+            onChange={(e) => {
+              setProblem(e.target.value);
+              setError("");
+            }}
+            maxLength={500}
+            placeholder="Describe a real consumer problem..."
+          />
 
-          <div className="scannerBottom">
-            <div className="characterCount">
-              {problem.length.toString().padStart(3, "0")} / 500
-            </div>
+          <div className="vl-scanner-bottom">
+            <span>{problem.length}/500</span>
 
             <button
-              className="analyzeButton"
+              type="button"
+              className="vl-analyze"
               onClick={runAnalysis}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <span className="buttonSpinner" />
-                  Analyzing
+                  <span className="vl-spinner" />
+                  Analyzing...
                 </>
               ) : (
                 <>
                   Analyze opportunity
-                  <span>✦</span>
+                  <b>✦</b>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        <div className="scannerNote">
+        <div className="vl-scanner-footer">
           <span>VENTURELENS AI</span>
-          <span>
-            START WITH A PROBLEM. END WITH A POSSIBILITY.
-          </span>
+          <span>TURN PROBLEMS INTO POSSIBILITIES.</span>
         </div>
       </section>
 
+      {/* ERROR */}
       {error && (
-        <div className="errorBox">
-          <strong>Something went wrong.</strong>
+        <div className="vl-error">
+          <strong>Analysis error</strong>
           <span>{error}</span>
         </div>
       )}
 
+      {/* LOADING */}
       {loading && (
-        <section className="loadingSection">
-          <div className="loadingOrb">
-            <div />
+        <section className="vl-loading">
+          <div className="vl-loading-ring">
+            <span />
           </div>
 
           <div>
-            <div className="loadingEyebrow">
-              VENTURELENS IS THINKING
+            <div className="vl-small-label">
+              VENTURELENS IS ANALYZING
             </div>
 
-            <h3>Turning the problem into possibilities...</h3>
+            <h3>
+              Finding the opportunity inside the problem...
+            </h3>
 
             <p>
               Evaluating business models, customer demand,
-              competition, risks and launch potential.
+              competition, risks and launch possibilities.
             </p>
           </div>
         </section>
       )}
 
+      {/* RESULTS */}
       {analysis && !loading && (
-        <section className="resultsSection" id="results">
-          <div className="resultsTop">
+        <section className="vl-results" id="results">
+          <div className="vl-results-header">
             <div>
-              <div className="sectionEyebrow">
+              <div className="vl-small-label">
                 AI-GENERATED ANALYSIS
               </div>
 
               <h2>
                 Opportunity
                 <br />
-                <em>report.</em>
+                <span>report.</span>
               </h2>
             </div>
 
             <button
-              className={saved ? "saveButton saved" : "saveButton"}
+              type="button"
+              className={
+                saved
+                  ? "vl-save saved"
+                  : "vl-save"
+              }
               onClick={() => setSaved(!saved)}
             >
               {saved ? "Saved ✓" : "Save opportunity"}
             </button>
           </div>
 
-          <div className="summaryGrid">
-            <div className="scoreCard">
-              <div className="scoreLabel">PROBLEM SCORE</div>
+          <div className="vl-summary">
+            <div className="vl-score-card">
+              <div className="vl-card-label">
+                PROBLEM SCORE
+              </div>
 
-              <div className="scoreNumber">
+              <div className="vl-score">
                 {analysis.problemScore}
                 <small>/100</small>
               </div>
 
-              <div className="scoreBar">
-                <div
+              <div className="vl-score-line">
+                <span
                   style={{
                     width: `${Math.min(
                       Math.max(analysis.problemScore, 0),
@@ -398,80 +422,80 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="insightCard">
-              <div className="cardEyebrow">PROBLEM INSIGHT</div>
+            <div className="vl-insight">
+              <div className="vl-card-label">
+                PROBLEM INSIGHT
+              </div>
 
               <p>{analysis.problemSummary}</p>
             </div>
           </div>
 
-          <div className="opportunitiesHeader">
-            <div>
-              <span>02</span>
-              TOP BUSINESS OPPORTUNITIES
-            </div>
+          <div className="vl-opportunities-title">
+            <span>
+              <b>02</b> TOP BUSINESS OPPORTUNITIES
+            </span>
 
-            <p>
-              Three directions worth investigating based on
-              the problem.
-            </p>
+            <small>
+              Potential directions worth investigating
+            </small>
           </div>
 
-          <div className="opportunityGrid">
-            {analysis.opportunities.map((opportunity, index) => (
-              <button
-                key={index}
-                className={
-                  selected === index
-                    ? "opportunityCard selected"
-                    : "opportunityCard"
-                }
-                onClick={() => {
-                  setSelected(index);
-                  setTab("overview");
-                }}
-              >
-                <div className="opportunityNumber">
-                  0{index + 1}
-                </div>
+          <div className="vl-opportunities">
+            {analysis.opportunities.map(
+              (opportunity, index) => (
+                <button
+                  type="button"
+                  key={index}
+                  className={
+                    selected === index
+                      ? "vl-opportunity selected"
+                      : "vl-opportunity"
+                  }
+                  onClick={() => {
+                    setSelected(index);
+                    setTab("overview");
+                  }}
+                >
+                  <div className="vl-opportunity-top">
+                    <span>0{index + 1}</span>
+                    <b>{opportunity.score}</b>
+                  </div>
 
-                <div className="opportunityScore">
-                  {opportunity.score}
-                </div>
+                  <h3>{opportunity.title}</h3>
 
-                <h3>{opportunity.title}</h3>
+                  <p>{opportunity.description}</p>
 
-                <p>{opportunity.description}</p>
+                  <div className="vl-opportunity-bottom">
+                    <span>
+                      {opportunity.demand} demand
+                    </span>
 
-                <div className="opportunityFooter">
-                  <span>
-                    {opportunity.demand} demand
-                  </span>
-
-                  <span className="cardArrow">↗</span>
-                </div>
-              </button>
-            ))}
+                    <b>↗</b>
+                  </div>
+                </button>
+              )
+            )}
           </div>
 
           {currentOpportunity && (
-            <section className="detailSection">
-              <div className="detailTop">
+            <section className="vl-detail">
+              <div className="vl-detail-header">
                 <div>
-                  <div className="sectionEyebrow">
+                  <div className="vl-small-label">
                     OPPORTUNITY 0{selected + 1}
                   </div>
 
                   <h2>{currentOpportunity.title}</h2>
                 </div>
 
-                <div className="detailScore">
+                <div className="vl-detail-score">
                   {currentOpportunity.score}
                   <small>/100</small>
                 </div>
               </div>
 
-              <div className="tabs">
+              <div className="vl-tabs">
                 {[
                   "overview",
                   "market",
@@ -479,9 +503,12 @@ export default function Home() {
                   "business",
                 ].map((item) => (
                   <button
+                    type="button"
                     key={item}
                     className={
-                      tab === item ? "tab active" : "tab"
+                      tab === item
+                        ? "active"
+                        : ""
                     }
                     onClick={() => setTab(item)}
                   >
@@ -491,270 +518,34 @@ export default function Home() {
               </div>
 
               {tab === "overview" && (
-                <div className="detailContent">
-                  <p className="detailDescription">
+                <div>
+                  <p className="vl-description">
                     {currentOpportunity.description}
                   </p>
 
-                  <div className="metricGrid">
+                  <div className="vl-metrics">
                     <Metric
                       label="STARTUP INVESTMENT"
-                      value={currentOpportunity.investment}
+                      value={
+                        currentOpportunity.investment
+                      }
                     />
 
                     <Metric
                       label="REVENUE MODEL"
-                      value={currentOpportunity.revenueModel}
+                      value={
+                        currentOpportunity.revenueModel
+                      }
                     />
 
                     <Metric
                       label="CUSTOMER DEMAND"
-                      value={currentOpportunity.demand}
+                      value={
+                        currentOpportunity.demand
+                      }
                     />
 
                     <Metric
-                      label="COMPETITION"
-                      value={currentOpportunity.competition}
-                    />
-                  </div>
-
-                  <CustomerList
-                    customers={analysis.market.targetCustomers}
-                  />
-                </div>
-              )}
-
-              {tab === "market" && (
-                <div className="detailContent">
-                  <div className="metricGrid">
-                    <Metric
-                      label="CUSTOMER DEMAND"
-                      value={analysis.market.customerDemand}
-                    />
-
-                    <Metric
-                      label="MARKET ACCESSIBILITY"
-                      value={analysis.market.marketAccessibility}
-                    />
-
-                    <Metric
-                      label="COMPETITIVE PRESSURE"
-                      value={analysis.market.competitivePressure}
-                    />
-
-                    <Metric
-                      label="SCALABILITY"
-                      value={analysis.market.scalability}
-                    />
-                  </div>
-
-                  <CustomerList
-                    customers={analysis.market.targetCustomers}
-                  />
-                </div>
-              )}
-
-              {tab === "risks" && (
-                <div className="twoColumns">
-                  <ListBlock
-                    title="BUSINESS RISKS"
-                    items={analysis.risks}
-                  />
-
-                  <ListBlock
-                    title="ETHICAL CONSIDERATIONS"
-                    items={analysis.ethicalConsiderations}
-                  />
-                </div>
-              )}
-
-              {tab === "business" && (
-                <div className="launchSection">
-                  <div className="cardEyebrow">
-                    PRACTICAL LAUNCH PLAN
-                  </div>
-
-                  <div className="launchPlan">
-                    {analysis.launchPlan.map((step, index) => (
-                      <div className="launchStep" key={index}>
-                        <div className="launchDay">
-                          {step.day}
-                        </div>
-
-                        <div className="launchNumber">
-                          {String(index + 1).padStart(2, "0")}
-                        </div>
-
-                        <div className="launchAction">
-                          {step.action}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </section>
-          )}
-        </section>
-      )}
-
-      <footer className="footer">
-        <div className="footerBrand">
-          VENTURE<span>LENS</span>
-        </div>
-
-        <div>AI BUSINESS OPPORTUNITY FINDER</div>
-
-        <div>TURN PROBLEMS INTO POSSIBILITIES.</div>
-      </footer>
-
-      <style jsx global>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        html {
-          scroll-behavior: smooth;
-          background: #090a09 !important;
-        }
-
-        body {
-          margin: 0 !important;
-          background: #090a09 !important;
-          color: #eeeDE7 !important;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif !important;
-        }
-
-        button,
-        textarea {
-          font-family: inherit !important;
-        }
-
-        button {
-          cursor: pointer;
-        }
-
-        .venturePage {
-          min-height: 100vh;
-          overflow: hidden;
-          background: #090a09 !important;
-          color: #eeeDE7 !important;
-        }
-
-        .topbar {
-          height: 72px;
-          padding: 0 42px;
-          border-bottom: 1px solid #34352f;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: #090a09;
-          position: relative;
-          z-index: 10;
-        }
-
-        .logo {
-          color: #f0efe8 !important;
-          font-size: 18px;
-          font-weight: 800;
-          letter-spacing: -0.7px;
-        }
-
-        .logo span,
-        .footerBrand span {
-          color: #d9f000 !important;
-        }
-
-        .topbarRight {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          color: #898980 !important;
-          font-size: 10px;
-          letter-spacing: 2.5px;
-        }
-
-        .statusDot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #d9f000;
-          box-shadow: 0 0 12px rgba(217, 240, 0, 0.6);
-        }
-
-        .hero {
-          min-height: 720px;
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          justify-content: center;
-          text-align: center;
-          background:
-            radial-gradient(
-              circle at 68% 30%,
-              rgba(191, 216, 126, 0.22),
-              transparent 27%
-            ),
-            radial-gradient(
-              circle at 50% 70%,
-              rgba(110, 120, 82, 0.08),
-              transparent 35%
-            ),
-            #090a09;
-        }
-
-        .heroGrid {
-          position: absolute;
-          inset: 0;
-          opacity: 0.28;
-          background-image:
-            linear-gradient(
-              rgba(255, 255, 255, 0.035) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(255, 255, 255, 0.035) 1px,
-              transparent 1px
-            );
-          background-size: 90px 90px;
-          mask-image: linear-gradient(
-            to bottom,
-            black,
-            transparent 80%
-          );
-        }
-
-        .heroOrb {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
-          filter: blur(70px);
-        }
-
-        .heroOrbOne {
-          width: 330px;
-          height: 330px;
-          top: 20px;
-          right: 7%;
-          background: rgba(207, 227, 147, 0.12);
-        }
-
-        .heroOrbTwo {
-          width: 250px;
-          height: 250px;
-          bottom: 20px;
-          left: 5%;
-          background: rgba(176, 195, 115, 0.06);
-        }
-
-        .heroContent {
-          position: relative;
-          z-index: 2;
-  tric
                       label="COMPETITION"
                       value={
                         currentOpportunity.competition
@@ -772,7 +563,7 @@ export default function Home() {
 
               {tab === "market" && (
                 <div>
-                  <div className="metricGrid">
+                  <div className="vl-metrics">
                     <Metric
                       label="CUSTOMER DEMAND"
                       value={
@@ -812,7 +603,7 @@ export default function Home() {
               )}
 
               {tab === "risks" && (
-                <div className="twoColumns">
+                <div className="vl-two-columns">
                   <ListBlock
                     title="BUSINESS RISKS"
                     items={analysis.risks}
@@ -829,31 +620,27 @@ export default function Home() {
 
               {tab === "business" && (
                 <div>
-                  <div className="label">
+                  <div className="vl-card-label">
                     PRACTICAL LAUNCH PLAN
                   </div>
 
-                  <div className="launchPlan">
+                  <div className="vl-launch">
                     {analysis.launchPlan.map(
                       (step, index) => (
                         <div
-                          className="launchStep"
+                          className="vl-launch-row"
                           key={index}
                         >
-                          <div className="launchDay">
-                            {step.day}
-                          </div>
+                          <span>{step.day}</span>
 
-                          <div className="launchNumber">
+                          <b>
                             {String(index + 1).padStart(
                               2,
                               "0"
                             )}
-                          </div>
+                          </b>
 
-                          <div className="launchAction">
-                            {step.action}
-                          </div>
+                          <p>{step.action}</p>
                         </div>
                       )
                     )}
@@ -865,11 +652,14 @@ export default function Home() {
         </section>
       )}
 
-      <footer>
-        <span>VENTURELENS</span>
-        <span>
-          TURN PROBLEMS INTO POSSIBILITIES.
-        </span>
+      <footer className="vl-footer">
+        <strong>
+          VENTURE<span>LENS</span>
+        </strong>
+
+        <span>AI BUSINESS OPPORTUNITY FINDER</span>
+
+        <span>TURN PROBLEMS INTO POSSIBILITIES.</span>
       </footer>
 
       <style jsx global>{`
@@ -877,617 +667,1127 @@ export default function Home() {
           box-sizing: border-box;
         }
 
-        html {
-          scroll-behavior: smooth;
-        }
-
+        html,
         body {
-          margin: 0;
-          background: #090a09;
-          color: #f0efe9;
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #080908 !important;
+          color: #efeee8 !important;
           font-family:
             Arial,
             Helvetica,
-            sans-serif;
+            sans-serif !important;
+        }
+
+        body {
+          overflow-x: hidden;
         }
 
         button,
         textarea {
-          font-family: inherit;
+          font-family: inherit !important;
         }
 
         button {
           cursor: pointer;
         }
 
-        .page {
+        .vl-page {
           min-height: 100vh;
-          background:
-            radial-gradient(
-              circle at 74% 23%,
-              rgba(202, 220, 150, 0.25),
-              transparent 24%
-            ),
-            #090a09;
+          background: #080908 !important;
+          color: #efeee8 !important;
         }
 
-        .header {
-          height: 68px;
-          padding: 0 28px;
-          border-bottom: 1px solid #45443c;
+        /* HEADER */
+
+        .vl-header {
+          height: 70px;
+          padding: 0 34px;
           display: flex;
-          align-items: center;
           justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #30312c;
+          background: #080908 !important;
+          position: relative;
+          z-index: 10;
         }
 
-        .brand {
-          font-size: 21px;
-          font-weight: 900;
-          color: #f0efe9;
+        .vl-logo {
+          color: #f0efe9 !important;
+          font-size: 20px;
+          font-weight: 800;
           letter-spacing: -1px;
         }
 
-        .brand span {
-          color: #d8f000;
+        .vl-logo span,
+        .vl-footer span {
+          color: #d9f000 !important;
         }
 
-        .headerRight {
-          font-size: 12px;
-          color: #c2c0b6;
+        .vl-header-label {
+          color: #77786f !important;
+          font-size: 9px;
           letter-spacing: 3px;
         }
 
-        .hero {
+        /* HERO */
+
+        .vl-hero {
+          min-height: 720px;
           position: relative;
-          min-height: 545px;
-          overflow: hidden;
-          padding: 48px 25px 70px;
+          display: flex;
+          justify-content: center;
           text-align: center;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 72% 22%,
+              rgba(204, 224, 145, 0.2),
+              transparent 27%
+            ),
+            radial-gradient(
+              circle at 30% 75%,
+              rgba(150, 170, 100, 0.06),
+              transparent 30%
+            ),
+            #080908 !important;
         }
 
-        .heroGlow {
+        .vl-grid {
           position: absolute;
-          width: 650px;
-          height: 650px;
+          inset: 0;
+          opacity: 0.25;
+          background-image:
+            linear-gradient(
+              rgba(255, 255, 255, 0.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.035) 1px,
+              transparent 1px
+            );
+          background-size: 90px 90px;
+          mask-image: linear-gradient(
+            to bottom,
+            black 0%,
+            transparent 90%
+          );
+        }
+
+        .vl-hero-glow {
+          position: absolute;
+          width: 520px;
+          height: 520px;
+          top: -180px;
+          right: 5%;
           border-radius: 50%;
-          background: rgba(214, 227, 161, 0.14);
+          background: rgba(211, 232, 147, 0.12);
           filter: blur(80px);
-          top: -220px;
-          right: 14%;
-          pointer-events: none;
         }
 
-        .eyebrow {
+        .vl-hero-content {
+          width: min(1100px, calc(100% - 40px));
           position: relative;
-          color: #aaa89d;
-          font-size: 12px;
-          letter-spacing: 4px;
-          font-weight: 500;
+          z-index: 2;
+          padding-top: 110px;
         }
 
-        .hero h1 {
-          position: relative;
-          max-width: 1150px;
-          margin: 55px auto 30px;
-          color: #f1f0eb;
-          font-size: clamp(58px, 7vw, 108px);
-          line-height: 0.9;
-          letter-spacing: -6px;
-          font-weight: 800;
+        .vl-eyebrow {
+          color: #92928a !important;
+          font-size: 10px;
+          letter-spacing: 3.5px;
         }
 
-        .hero p {
-          position: relative;
-          max-width: 760px;
-          margin: auto;
-          color: #bbb9ae;
-          font-size: 18px;
+        .vl-hero h1 {
+          margin: 55px auto 28px !important;
+          color: #f0efe9 !important;
+          font-size: clamp(55px, 8vw, 110px) !important;
+          line-height: 0.88 !important;
+          letter-spacing: -6px !important;
+          font-weight: 800 !important;
+        }
+
+        .vl-hero h1 span {
+          color: #d9f000 !important;
+        }
+
+        .vl-hero-description {
+          max-width: 700px;
+          margin: 0 auto;
+          color: #a5a49c !important;
+          font-size: 16px;
           line-height: 1.7;
         }
 
-        .scanner {
-          width: calc(100% - 74px);
-          margin: -10px auto 90px;
-          border: 1px solid #5a584c;
-          border-radius: 32px;
-          background: #0c0d0c;
-          overflow: hidden;
-        }
+        /* THE BUTTON */
 
-        .categoryRow {
-          padding: 30px 38px 22px;
-          display: flex;
+        .vl-try-button {
+          display: inline-flex !important;
           align-items: center;
-          gap: 25px;
-          flex-wrap: wrap;
-        }
-
-        .categoryLabel,
-        .label,
-        .sectionTitle {
-          color: #aaa89e;
-          font-size: 12px;
-          letter-spacing: 3px;
-          font-weight: 500;
-        }
-
-        .categories {
-          display: flex;
+          justify-content: center;
           gap: 14px;
-          flex-wrap: wrap;
+          margin-top: 42px !important;
+          padding: 16px 27px !important;
+          min-width: 190px;
+          border: 1px solid #696a60 !important;
+          border-radius: 50px !important;
+          background: #10110f !important;
+          color: #f0efe9 !important;
+          font-size: 14px !important;
+          font-weight: 700 !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          position: relative;
+          z-index: 20;
+          transition: 0.25s ease;
         }
 
-        .category {
-          border: 1px solid #57554b;
-          background: transparent;
-          color: #e5e3dc;
-          border-radius: 30px;
-          padding: 12px 23px;
-          font-size: 16px;
+        .vl-try-button b {
+          color: #d9f000 !important;
+          font-size: 18px;
         }
 
-        .category:hover,
-        .category.active {
-          color: #111;
-          background: #d8f000;
-          border-color: #d8f000;
-        }
-
-        textarea {
-          width: 100%;
-          min-height: 300px;
-          display: block;
-          resize: vertical;
-          border: 0;
-          border-top: 1px solid #3b3a35;
-          border-bottom: 1px solid #3b3a35;
-          outline: none;
-          background: #0c0d0c;
-          color: #efeee9;
-          padding: 38px 40px;
-          font-size: clamp(27px, 3vw, 43px);
-          line-height: 1.22;
-        }
-
-        textarea::placeholder {
-          color: #77766d;
-        }
-
-        .scannerBottom {
-          min-height: 115px;
-          padding: 25px 38px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          color: #aaa89e;
-        }
-
-        .analyze {
-          border: 0;
-          border-radius: 40px;
-          padding: 19px 30px;
-          background: #050505;
-          color: #f3f1ea;
-          font-weight: 700;
-          font-size: 16px;
-        }
-
-        .analyze:hover:not(:disabled) {
-          background: #d8f000;
-          color: #101010;
-        }
-
-        .analyze:disabled {
-          opacity: 0.55;
-          cursor: wait;
-        }
-
-        .error,
-        .loading {
-          width: calc(100% - 74px);
-          margin: -50px auto 70px;
-          border-radius: 18px;
-          padding: 22px 25px;
-        }
-
-        .error {
-          border: 1px solid #743c3c;
-          background: #1b0d0d;
-          color: #ff8989;
-        }
-
-        .loading {
-          border: 1px solid #555348;
-          background: #10110f;
-          color: #eee;
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .loading p {
-          color: #a4a39a;
-          margin-bottom: 0;
-        }
-
-        .spinner {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          border: 3px solid #47473e;
-          border-top-color: #d8f000;
-          animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        .results {
-          width: calc(100% - 74px);
-          margin: 0 auto 100px;
-        }
-
-        .resultsHeading,
-        .detailHeading {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 30px;
-          margin-bottom: 35px;
-        }
-
-        .results h2,
-        .detail h2 {
-          margin: 10px 0 0;
-          color: #f1f0eb;
-          font-size: clamp(42px, 5vw, 70px);
-          line-height: 0.95;
-          letter-spacing: -4px;
-        }
-
-        .save {
-          border: 1px solid #5a584d;
-          background: transparent;
-          color: #e4e2db;
-          border-radius: 30px;
-          padding: 13px 21px;
-        }
-
-        .save.saved {
-          background: #d8f000;
-          color: #111;
-          border-color: #d8f000;
-        }
-
-        .summaryGrid {
-          display: grid;
-          grid-template-columns: 1fr 2fr;
-          gap: 18px;
-          margin-bottom: 75px;
-        }
-
-        .scoreCard,
-        .insightCard,
-        .detail {
-          border: 1px solid #45443d;
-          border-radius: 25px;
-          background: #0c0d0c;
-        }
-
-        .scoreCard {
-          padding: 30px;
-          display: flex;
-          align-items: center;
-          gap: 28px;
-        }
-
-        .score {
-          color: #d8f000;
-          font-size: 70px;
-          font-weight: 800;
-        }
-
-        .scoreCard p,
-        .insightCard p {
-          color: #bdbbb1;
-          line-height: 1.6;
-        }
-
-        .insightCard {
-          padding: 30px;
-        }
-
-        .insightCard p {
-          font-size: 19px;
-          margin-bottom: 0;
-        }
-
-        .sectionTitle {
-          margin-bottom: 22px;
-        }
-
-        .opportunityGrid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 18px;
-          margin-bottom: 80px;
-        }
-
-        .opportunity {
-          min-height: 310px;
-          text-align: left;
-          padding: 30px;
-          border: 1px solid #46453d;
-          border-radius: 25px;
-          background: #0c0d0c;
-          color: #eee;
-          transition: 0.2s;
-        }
-
-        .opportunity:hover,
-        .opportunity.selected {
-          border-color: #d8f000;
+        .vl-try-button:hover {
+          background: #d9f000 !important;
+          color: #101010 !important;
+          border-color: #d9f000 !important;
           transform: translateY(-3px);
         }
 
-        .number {
-          color: #d8f000;
+        .vl-try-button:hover b {
+          color: #101010 !important;
+          transform: translateY(3px);
+        }
+
+        .vl-hero-stats {
+          margin-top: 75px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 25px;
+        }
+
+        .vl-hero-stats div {
+          display: flex;
+          gap: 8px;
+          color: #66675f !important;
+          font-size: 9px;
           letter-spacing: 2px;
         }
 
-        .opportunity h3 {
-          color: #f0efe9;
-          font-size: 28px;
-          line-height: 1.1;
-          letter-spacing: -1px;
-          margin: 38px 0 16px;
+        .vl-hero-stats strong {
+          color: #d9f000 !important;
         }
 
-        .opportunity p {
-          color: #aaa99f;
-          line-height: 1.55;
+        .vl-hero-stats i {
+          width: 45px;
+          height: 1px;
+          background: #363730;
+        }
+
+        .vl-scroll {
+          position: absolute;
+          bottom: 25px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+          color: #55564f !important;
+          font-size: 8px;
+          letter-spacing: 2px;
+        }
+
+        .vl-scroll b {
+          color: #d9f000 !important;
           font-size: 15px;
         }
 
-        .opportunityBottom {
-          margin-top: 32px;
+        /* STATEMENT */
+
+        .vl-statement {
+          min-height: 350px;
+          padding: 65px 7%;
+          display: grid;
+          grid-template-columns: 90px 1.4fr 0.8fr;
+          gap: 50px;
+          border-top: 1px solid #30312c;
+          border-bottom: 1px solid #30312c;
+          background: #0b0c0b !important;
+        }
+
+        .vl-statement-number {
+          color: #d9f000 !important;
+          font-size: 11px;
+          letter-spacing: 2px;
+        }
+
+        .vl-small-label,
+        .vl-card-label {
+          color: #77786f !important;
+          font-size: 9px;
+          letter-spacing: 2.5px;
+        }
+
+        .vl-statement-main h2 {
+          margin: 17px 0 0;
+          color: #eeeDE7 !important;
+          font-size: clamp(38px, 5vw, 66px);
+          line-height: 0.98;
+          letter-spacing: -4px;
+        }
+
+        .vl-statement-side {
+          padding-top: 10px;
+        }
+
+        .vl-statement-side p {
+          color: #8f8f87 !important;
+          font-size: 14px;
+          line-height: 1.7;
+          margin: 0 0 24px;
+        }
+
+        /* SCANNER */
+
+        .vl-scanner-section {
+          padding: 120px 6% 100px;
+          background: #080908 !important;
+        }
+
+        .vl-scanner-heading {
+          max-width: 1250px;
+          margin: 0 auto 45px;
           display: flex;
           justify-content: space-between;
-          color: #aaa99e;
+          align-items: end;
+          gap: 40px;
         }
 
-        .opportunityBottom strong {
-          color: #d8f000;
+        .vl-scanner-heading h2 {
+          margin: 15px 0 0;
+          color: #eeeDE7 !important;
+          font-size: clamp(45px, 6vw, 78px);
+          line-height: 0.9;
+          letter-spacing: -4px;
         }
 
-        .arrow {
-          font-size: 20px;
+        .vl-scanner-heading > p {
+          color: #77786f !important;
+          font-size: 13px;
+          line-height: 1.7;
         }
 
-        .detail {
-          padding: 40px;
+        .vl-scanner {
+          max-width: 1250px;
+          margin: 0 auto;
+          border: 1px solid #484940;
+          border-radius: 28px;
+          overflow: hidden;
+          background: #0c0d0c !important;
         }
 
-        .bigScore {
-          color: #d8f000;
-          font-size: 52px;
-          font-weight: 800;
-        }
-
-        .bigScore small {
-          color: #77766d;
-          font-size: 18px;
-          font-weight: 400;
-        }
-
-        .tabs {
+        .vl-scanner-top {
+          min-height: 92px;
+          padding: 24px 30px;
           display: flex;
-          gap: 8px;
-          border-bottom: 1px solid #3d3c37;
-          margin-bottom: 35px;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 22px;
+          border-bottom: 1px solid #353630;
         }
 
-        .tab {
-          padding: 15px 20px;
-          border: 0;
-          border-bottom: 2px solid transparent;
-          background: transparent;
-          color: #88877e;
-          text-transform: capitalize;
+        .vl-scanner-top > span {
+          color: #77786f !important;
+          font-size: 9px;
+          letter-spacing: 2.5px;
         }
 
-        .tab.active {
-          color: #d8f000;
-          border-bottom-color: #d8f000;
+        .vl-categories {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
         }
 
-        .description {
-          max-width: 900px;
-          color: #d1d0c9;
-          font-size: 21px;
-          line-height: 1.6;
-          margin-bottom: 35px;
+        .vl-category {
+          padding: 10px 17px;
+          border: 1px solid #484940 !important;
+          border-radius: 30px;
+          background: transparent !important;
+          color: #aaa9a1 !important;
+          font-size: 12px;
         }
 
-        .metricGrid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-          margin-bottom: 20px;
+        .vl-category:hover,
+        .vl-category.active {
+          background: #d9f000 !important;
+          border-color: #d9f000 !important;
+          color: #101010 !important;
         }
 
-        .metric {
-          min-height: 120px;
-          padding: 24px;
-          border: 1px solid #45443d;
-          border-radius: 20px;
-          background: #0b0c0b;
+        .vl-scanner textarea {
+          width: 100%;
+          min-height: 320px;
+          display: block;
+          resize: vertical;
+          border: 0 !important;
+          outline: 0 !important;
+          padding: 38px 35px;
+          background: #0b0c0b !important;
+          color: #eeeDE7 !important;
+          font-size: clamp(25px, 3vw, 40px);
+          line-height: 1.25;
         }
 
-        .metricValue {
-          margin-top: 18px;
-          color: #f0efe9;
-          font-size: 19px;
+        .vl-scanner textarea::placeholder {
+          color: #55564f !important;
+          opacity: 1;
+        }
+
+        .vl-scanner-bottom {
+          min-height: 105px;
+          padding: 22px 30px;
+          border-top: 1px solid #353630;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .vl-scanner-bottom > span {
+          color: #66675f !important;
+          font-size: 11px;
+        }
+
+        .vl-analyze {
+          min-width: 210px;
+          min-height: 52px;
+          border: 0 !important;
+          border-radius: 40px;
+          background: #050605 !important;
+          color: #f0efe9 !important;
+          font-size: 13px;
           font-weight: 700;
         }
 
-        .customerBox {
-          padding: 25px;
-          border: 1px solid #45443d;
-          border-radius: 20px;
-          background: #0b0c0b;
+        .vl-analyze b {
+          color: #d9f000 !important;
+          margin-left: 8px;
         }
 
-        .tags {
+        .vl-analyze:hover:not(:disabled) {
+          background: #d9f000 !important;
+          color: #101010 !important;
+        }
+
+        .vl-analyze:hover:not(:disabled) b {
+          color: #101010 !important;
+        }
+
+        .vl-spinner {
+          display: inline-block;
+          width: 13px;
+          height: 13px;
+          margin-right: 9px;
+          border: 2px solid #55564e;
+          border-top-color: #d9f000;
+          border-radius: 50%;
+          animation: vlspin 0.7s linear infinite;
+        }
+
+        .vl-scanner-footer {
+          max-width: 1250px;
+          margin: 15px auto 0;
+          display: flex;
+          justify-content: space-between;
+          color: #50514b !important;
+          font-size: 8px;
+          letter-spacing: 2px;
+        }
+
+        /* ERROR / LOADING */
+
+        .vl-error {
+          width: 88%;
+          max-width: 1250px;
+          margin: -30px auto 70px;
+          padding: 20px 24px;
+          border: 1px solid #713d3d;
+          border-radius: 15px;
+          background: #1a0e0e !important;
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+        }
+
+        .vl-error strong {
+          color: #ff9999 !important;
+        }
+
+        .vl-error span {
+          color: #bd7777 !important;
+          font-size: 13px;
+        }
+
+        .vl-loading {
+          width: 88%;
+          max-width: 1250px;
+          margin: 0 auto 80px;
+          padding: 45px;
+          display: flex;
+          align-items: center;
+          gap: 30px;
+          border: 1px solid #41423b;
+          border-radius: 25px;
+          background: #0d0e0d !important;
+        }
+
+        .vl-loading-ring {
+          width: 65px;
+          height: 65px;
+          border: 1px solid #44453e;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+        }
+
+        .vl-loading-ring span {
+          width: 32px;
+          height: 32px;
+          border: 2px solid #44453e;
+          border-top-color: #d9f000;
+          border-radius: 50%;
+          animation: vlspin 0.8s linear infinite;
+        }
+
+        .vl-loading h3 {
+          margin: 9px 0;
+          color: #eeeDE7 !important;
+          font-size: 24px;
+        }
+
+        .vl-loading p {
+          margin: 0;
+          color: #77786f !important;
+          font-size: 13px;
+        }
+
+        /* RESULTS */
+
+        .vl-results {
+          padding: 120px 6% 130px;
+          border-top: 1px solid #30312c;
+          background: #0a0b0a !important;
+        }
+
+        .vl-results-header {
+          max-width: 1250px;
+          margin: 0 auto 60px;
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+        }
+
+        .vl-results-header h2 {
+          margin: 15px 0 0;
+          color: #eeeDE7 !important;
+          font-size: clamp(48px, 6vw, 78px);
+          line-height: 0.9;
+          letter-spacing: -4px;
+        }
+
+        .vl-results-header h2 span {
+          color: #d9f000 !important;
+        }
+
+        .vl-save {
+          padding: 13px 21px;
+          border: 1px solid #494a42 !important;
+          border-radius: 30px;
+          background: transparent !important;
+          color: #aaa9a1 !important;
+        }
+
+        .vl-save.saved {
+          background: #d9f000 !important;
+          border-color: #d9f000 !important;
+          color: #101010 !important;
+        }
+
+        .vl-summary {
+          max-width: 1250px;
+          margin: 0 auto 80px;
+          display: grid;
+          grid-template-columns: 0.8fr 1.6fr;
+          gap: 17px;
+        }
+
+        .vl-score-card,
+        .vl-insight {
+          padding: 30px;
+          border: 1px solid #40413a;
+          border-radius: 23px;
+          background: #0d0e0d !important;
+        }
+
+        .vl-score {
+          margin: 20px 0;
+          color: #d9f000 !important;
+          font-size: 70px;
+          font-weight: 800;
+          letter-spacing: -4px;
+        }
+
+        .vl-score small {
+          color: #66675f !important;
+          font-size: 16px;
+          letter-spacing: 0;
+        }
+
+        .vl-score-line {
+          height: 3px;
+          background: #292a26;
+          margin-bottom: 22px;
+        }
+
+        .vl-score-line span {
+          display: block;
+          height: 100%;
+          background: #d9f000;
+        }
+
+        .vl-score-card p {
+          color: #77786f !important;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .vl-insight {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .vl-insight p {
+          max-width: 850px;
+          margin: 18px 0 0;
+          color: #c0bfb7 !important;
+          font-size: 18px;
+          line-height: 1.65;
+        }
+
+        .vl-opportunities-title {
+          max-width: 1250px;
+          margin: 0 auto 20px;
+          display: flex;
+          justify-content: space-between;
+          color: #85867e !important;
+          font-size: 9px;
+          letter-spacing: 2.5px;
+        }
+
+        .vl-opportunities-title b {
+          color: #d9f000 !important;
+          margin-right: 14px;
+        }
+
+        .vl-opportunities-title small {
+          color: #55564f !important;
+          font-size: 10px;
+          letter-spacing: 0;
+        }
+
+        .vl-opportunities {
+          max-width: 1250px;
+          margin: 0 auto 80px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+
+        .vl-opportunity {
+          min-height: 315px;
+          padding: 28px;
+          text-align: left;
+          border: 1px solid #3f4039 !important;
+          border-radius: 23px;
+          background: #0d0e0d !important;
+          color: #eeeDE7 !important;
+          transition: 0.25s ease;
+        }
+
+        .vl-opportunity:hover,
+        .vl-opportunity.selected {
+          border-color: #d9f000 !important;
+          transform: translateY(-4px);
+        }
+
+        .vl-opportunity-top {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .vl-opportunity-top span {
+          color: #d9f000 !important;
+          font-size: 10px;
+          letter-spacing: 2px;
+        }
+
+        .vl-opportunity-top b {
+          color: #77786f !important;
+          font-size: 12px;
+        }
+
+        .vl-opportunity h3 {
+          margin: 65px 0 15px;
+          color: #eeeDE7 !important;
+          font-size: 25px;
+          line-height: 1.1;
+        }
+
+        .vl-opportunity p {
+          min-height: 70px;
+          color: #77786f !important;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .vl-opportunity-bottom {
+          margin-top: 25px;
+          padding-top: 15px;
+          border-top: 1px solid #2d2e29;
+          display: flex;
+          justify-content: space-between;
+          color: #66675f !important;
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+        }
+
+        .vl-opportunity-bottom b {
+          color: #d9f000 !important;
+          font-size: 17px;
+        }
+
+        /* DETAIL */
+
+        .vl-detail {
+          max-width: 1250px;
+          margin: 0 auto;
+          padding: 40px;
+          border: 1px solid #41423b;
+          border-radius: 25px;
+          background: #0d0e0d !important;
+        }
+
+        .vl-detail-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .vl-detail-header h2 {
+          margin: 12px 0 0;
+          color: #eeeDE7 !important;
+          font-size: clamp(34px, 5vw, 58px);
+          letter-spacing: -3px;
+        }
+
+        .vl-detail-score {
+          color: #d9f000 !important;
+          font-size: 50px;
+          font-weight: 800;
+        }
+
+        .vl-detail-score small {
+          color: #66675f !important;
+          font-size: 15px;
+        }
+
+        .vl-tabs {
+          margin: 35px 0;
+          display: flex;
+          gap: 5px;
+          border-bottom: 1px solid #363731;
+        }
+
+        .vl-tabs button {
+          padding: 13px 18px;
+          border: 0;
+          border-bottom: 2px solid transparent;
+          background: transparent;
+          color: #66675f !important;
+          text-transform: capitalize;
+        }
+
+        .vl-tabs button.active {
+          color: #d9f000 !important;
+          border-bottom-color: #d9f000;
+        }
+
+        .vl-description {
+          max-width: 900px;
+          color: #c1c0b8 !important;
+          font-size: 18px;
+          line-height: 1.65;
+        }
+
+        .vl-metrics {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin: 30px 0 15px;
+        }
+
+        .vl-metric {
+          min-height: 115px;
+          padding: 22px;
+          border: 1px solid #383933;
+          border-radius: 17px;
+          background: #0a0b0a !important;
+        }
+
+        .vl-metric-value {
+          margin-top: 15px;
+          color: #eeeDE7 !important;
+          font-size: 17px;
+          font-weight: 700;
+          line-height: 1.35;
+        }
+
+        .vl-customers {
+          margin-top: 15px;
+          padding: 22px;
+          border: 1px solid #383933;
+          border-radius: 17px;
+          background: #0a0b0a !important;
+        }
+
+        .vl-tags {
+          margin-top: 15px;
           display: flex;
           flex-wrap: wrap;
-          gap: 10px;
-          margin-top: 18px;
+          gap: 8px;
         }
 
-        .tag {
-          border: 1px solid #4e4d44;
+        .vl-tag {
+          padding: 9px 13px;
+          border: 1px solid #41423b;
           border-radius: 30px;
-          padding: 10px 15px;
-          color: #d5d3ca;
+          color: #aaa9a1 !important;
+          font-size: 12px;
         }
 
-        .twoColumns {
+        .vl-two-columns {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 60px;
         }
 
-        .list {
+        .vl-list {
+          margin-top: 15px;
+        }
+
+        .vl-list-item {
+          padding: 16px 0;
+          border-bottom: 1px solid #30312c;
+          color: #aaa9a1 !important;
+          font-size: 14px;
+          line-height: 1.55;
+        }
+
+        .vl-launch {
           margin-top: 20px;
         }
 
-        .listItem {
-          padding: 17px 0;
-          border-bottom: 1px solid #34342f;
-          color: #d0cec6;
-          line-height: 1.5;
-        }
-
-        .launchPlan {
-          margin-top: 20px;
-        }
-
-        .launchStep {
+        .vl-launch-row {
+          min-height: 72px;
           display: grid;
-          grid-template-columns: 130px 55px 1fr;
+          grid-template-columns: 120px 45px 1fr;
           align-items: center;
-          min-height: 75px;
-          border-bottom: 1px solid #34342f;
+          border-bottom: 1px solid #30312c;
         }
 
-        .launchDay {
-          color: #929189;
-          font-size: 11px;
-          letter-spacing: 2px;
+        .vl-launch-row > span {
+          color: #66675f !important;
+          font-size: 9px;
+          letter-spacing: 1.5px;
           text-transform: uppercase;
         }
 
-        .launchNumber {
-          color: #d8f000;
+        .vl-launch-row > b {
+          color: #d9f000 !important;
+          font-size: 11px;
         }
 
-        .launchAction {
-          color: #d4d2ca;
+        .vl-launch-row p {
+          color: #b8b7af !important;
+          font-size: 14px;
         }
 
-        footer {
-          padding: 35px 28px;
-          border-top: 1px solid #393832;
+        /* FOOTER */
+
+        .vl-footer {
+          min-height: 105px;
+          padding: 35px 34px;
+          border-top: 1px solid #30312c;
           display: flex;
           justify-content: space-between;
-          color: #8b8980;
-          font-size: 11px;
-          letter-spacing: 3px;
+          align-items: center;
+          color: #55564f !important;
+          font-size: 8px;
+          letter-spacing: 2px;
+          background: #080908 !important;
         }
 
+        .vl-footer strong {
+          color: #d0cfc7 !important;
+          font-size: 15px;
+          letter-spacing: -0.5px;
+        }
+
+        /* ANIMATION */
+
+        @keyframes vlspin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* TABLET */
+
         @media (max-width: 900px) {
-          .summaryGrid,
-          .opportunityGrid,
-          .twoColumns {
+          .vl-hero {
+            min-height: 680px;
+          }
+
+          .vl-statement {
+            grid-template-columns: 60px 1fr;
+          }
+
+          .vl-statement-side {
+            grid-column: 2;
+          }
+
+          .vl-scanner-heading {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .vl-summary,
+          .vl-opportunities,
+          .vl-two-columns {
             grid-template-columns: 1fr;
           }
 
-          .metricGrid {
+          .vl-metrics {
             grid-template-columns: 1fr 1fr;
-          }
-
-          .hero h1 {
-            letter-spacing: -4px;
           }
         }
 
-        @media (max-width: 600px) {
-          .headerRight {
-            display: none;
-          }
+        /* MOBILE */
 
-          .header {
+        @media (max-width: 600px) {
+          .vl-header {
+            height: 62px;
             padding: 0 18px;
           }
 
-          .hero {
-            padding-left: 18px;
-            padding-right: 18px;
+          .vl-logo {
+            font-size: 17px;
           }
 
-          .hero h1 {
-            font-size: 48px;
+          .vl-header-label {
+            display: none;
           }
 
-          .scanner,
-          .results,
-          .error,
-          .loading {
-            width: calc(100% - 24px);
+          .vl-hero {
+            min-height: 650px;
           }
 
-          .categoryRow,
-          .scannerBottom,
-          .detail {
-            padding: 22px;
+          .vl-hero-content {
+            width: calc(100% - 28px);
+            padding-top: 75px;
           }
 
-          textarea {
-            min-height: 240px;
-            padding: 25px 22px;
+          .vl-eyebrow {
+            font-size: 8px;
+            letter-spacing: 2px;
           }
 
-          .scannerBottom {
-            align-items: flex-start;
-            flex-direction: column;
+          .vl-hero h1 {
+            margin-top: 40px !important;
+            font-size: 49px !important;
+            letter-spacing: -3px !important;
+          }
+
+          .vl-hero-description {
+            font-size: 13px;
+            line-height: 1.65;
+          }
+
+          .vl-try-button {
+            margin-top: 32px !important;
+          }
+
+          .vl-hero-stats {
+            margin-top: 55px;
+            gap: 9px;
+          }
+
+          .vl-hero-stats div {
+            font-size: 7px;
+            gap: 5px;
+          }
+
+          .vl-hero-stats i {
+            width: 18px;
+          }
+
+          .vl-statement {
+            min-height: auto;
+            padding: 50px 22px;
+            grid-template-columns: 30px 1fr;
             gap: 18px;
           }
 
-          .analyze {
+          .vl-statement-main h2 {
+            font-size: 40px;
+            letter-spacing: -2px;
+          }
+
+          .vl-statement-side {
+            grid-column: 2;
+            padding-top: 0;
+          }
+
+          .vl-scanner-section {
+            padding: 80px 12px 70px;
+          }
+
+          .vl-scanner-heading h2 {
+            font-size: 46px;
+            letter-spacing: -3px;
+          }
+
+          .vl-scanner-heading > p {
+            font-size: 12px;
+          }
+
+          .vl-scanner {
+            border-radius: 20px;
+          }
+
+          .vl-scanner-top {
+            padding: 20px;
+          }
+
+          .vl-categories {
+            gap: 6px;
+          }
+
+          .vl-category {
+            padding: 8px 11px;
+            font-size: 9px;
+          }
+
+          .vl-scanner textarea {
+            min-height: 245px;
+            padding: 25px 20px;
+            font-size: 24px;
+          }
+
+          .vl-scanner-bottom {
+            padding: 18px 20px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+          }
+
+          .vl-analyze {
             width: 100%;
           }
 
-          .metricGrid {
-            grid-template-columns: 1fr;
+          .vl-scanner-footer {
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 5px;
           }
 
-          .resultsHeading,
-          .detailHeading {
+          .vl-error,
+          .vl-loading {
+            width: calc(100% - 24px);
+          }
+
+          .vl-loading {
+            padding: 28px;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .vl-results {
+            padding: 80px 12px;
+          }
+
+          .vl-results-header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 25px;
+          }
+
+          .vl-results-header h2 {
+            font-size: 48px;
+          }
+
+          .vl-score-card,
+          .vl-insight {
+            padding: 24px;
+          }
+
+          .vl-opportunities-title {
+            flex-direction: column;
+            gap: 8px;
+          }
+
+          .vl-detail {
+            padding: 22px;
+            border-radius: 20px;
+          }
+
+          .vl-detail-header {
             align-items: flex-start;
             flex-direction: column;
           }
 
-          .launchStep {
-            grid-template-columns: 80px 40px 1fr;
+          .vl-detail-header h2 {
+            font-size: 37px;
           }
 
-          footer {
+          .vl-tabs {
+            overflow-x: auto;
+          }
+
+          .vl-tabs button {
+            white-space: nowrap;
+          }
+
+          .vl-metrics {
+            grid-template-columns: 1fr;
+          }
+
+          .vl-two-columns {
+            gap: 40px;
+          }
+
+          .vl-launch-row {
+            grid-template-columns: 70px 35px 1fr;
+          }
+
+          .vl-footer {
+            padding: 28px 20px;
             flex-direction: column;
-            gap: 15px;
+            align-items: flex-start;
+            gap: 13px;
           }
         }
       `}</style>
@@ -1503,9 +1803,9 @@ function Metric({
   value: string;
 }) {
   return (
-    <div className="metric">
-      <div className="label">{label}</div>
-      <div className="metricValue">{value}</div>
+    <div className="vl-metric">
+      <div className="vl-card-label">{label}</div>
+      <div className="vl-metric-value">{value}</div>
     </div>
   );
 }
@@ -1516,12 +1816,14 @@ function CustomerList({
   customers: string[];
 }) {
   return (
-    <div className="customerBox">
-      <div className="label">TARGET CUSTOMERS</div>
+    <div className="vl-customers">
+      <div className="vl-card-label">
+        TARGET CUSTOMERS
+      </div>
 
-      <div className="tags">
+      <div className="vl-tags">
         {customers.map((customer, index) => (
-          <span className="tag" key={index}>
+          <span className="vl-tag" key={index}>
             {customer}
           </span>
         ))}
@@ -1539,11 +1841,11 @@ function ListBlock({
 }) {
   return (
     <div>
-      <div className="label">{title}</div>
+      <div className="vl-card-label">{title}</div>
 
-      <div className="list">
+      <div className="vl-list">
         {items.map((item, index) => (
-          <div className="listItem" key={index}>
+          <div className="vl-list-item" key={index}>
             {item}
           </div>
         ))}
